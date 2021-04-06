@@ -6,28 +6,8 @@ client.on("ready", () => {
 })
 
 client.on("message", msg => {
-    if (msg.content == "da") {
-        msg.reply("net")
-    }
-})
-
-client.on("message", msg => {
-    if (msg.content == "Вопрос для @Ledary  : почему каждый день не обновляем?") {
-        msg.reply(":whynot4:");
-        msg.reply("откуда знать")
-        msg.reply("вроде и так пойдёт")
-    }
-})
-
-client.on("message", msg => {
-    if (msg.content == "privet") {
-        msg.reply("ну, привет");
-    }
-})
-
-client.on("message", msg => {
-    if (msg.content == "привет") {
-        msg.reply("ну, привет");
+    if (msg.content == "test") {
+        msg.reply("test completed")
     }
 })
 

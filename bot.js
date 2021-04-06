@@ -11,4 +11,12 @@ client.on("message", msg => {
     }
 })
 
+client.on("message", msg => {
+    if (msg.content == "Вопрос для @Ledary  : почему каждый день не обновляем?") {
+        msg.reply(":whynot4:");
+        msg.reply("откуда знать")
+        msg.reply("вроде и так пойдёт")
+    }
+})
+
 client.login(process.env.TOKEN)

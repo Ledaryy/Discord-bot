@@ -19,4 +19,16 @@ client.on("message", msg => {
     }
 })
 
+client.on("message", msg => {
+    if (msg.content == "privet") {
+        msg.reply("ну, привет");
+    }
+})
+
+client.on("message", msg => {
+    if (msg.content == "привет") {
+        msg.reply("ну, привет");
+    }
+})
+
 client.login(process.env.TOKEN)

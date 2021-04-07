@@ -22,4 +22,3 @@
 - Few tests:
 
 <img src="https://image.prntscr.com/image/osD9wqLtRBCymzKRhl6rNQ.png"/>
-

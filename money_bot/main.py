@@ -1,25 +1,11 @@
-import os
 import crontab
-import requests
-from dotenv import load_dotenv
 
-load_dotenv()
+from sender import Sender
 
-TOKEN = os.environ['TOKEN']
+discord = Sender()
 
-payload = {
-    "content": "hi"
-}
-
-headers = {
-    "authorization": f"{TOKEN}"
-}
+discord.send_message(",crime")
 
 
-r = requests.post(
-    "https://discord.com/api/v9/channels/969301454437355620/messages",
-    data=payload,
-    headers=headers
-    )
 
-print(r)
+

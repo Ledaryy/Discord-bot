@@ -18,7 +18,7 @@ if __name__ == '__main__':
     start_process()
     time = datetime.now()
     while True:
-        if (datetime.now() - time) > timedelta(hours=4):
+        if (datetime.now() - time) > timedelta(hours=4, minutes=15):
             start_process()
             time = datetime.now()
         else:

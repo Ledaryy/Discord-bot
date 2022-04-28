@@ -29,4 +29,5 @@ class Sender():
             "headers": headers
         }
 
-        requests.post(**request_body)
+        r = requests.post(**request_body)
+        print(f"Message sent: '{message}', response: '{r}'")

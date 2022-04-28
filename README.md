@@ -22,3 +22,7 @@
 - Few tests:
 
 <img src="https://image.prntscr.com/image/osD9wqLtRBCymzKRhl6rNQ.png"/>
+
+
+# Other
+Money_bot: For Unbelieva bot

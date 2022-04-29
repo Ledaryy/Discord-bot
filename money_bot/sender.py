@@ -1,20 +1,20 @@
 import requests
 
 from settings import (
-    TOKEN,
+    #TOKEN,
     CHANNEL_ID
 )
 
 
 class Sender():
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, token):
+        self.token = token
 
     def send_message(self, message):
 
         headers = {
-            "authorization": f"{TOKEN}"
+            "authorization": f"{self.token}"
         }
 
         endpoint = f"https://discord.com/api/v9/channels/{CHANNEL_ID}/messages"

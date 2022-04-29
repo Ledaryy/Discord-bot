@@ -1,30 +1,30 @@
+import random
 from datetime import datetime, timedelta
 from time import sleep
-
 from sender import Sender
 
-discord = Sender()
 
-def start_process():
+def start_process(discord):
     print("Starting process...")
     discord.send_message(",work")
-    sleep(31)
-    discord.send_message(",crime")
-    sleep(31)
+    sleep(random.randint(10, 30))
     discord.send_message(",collect")
 
 
 if __name__ == '__main__':
-    start_process()
+
+    print('Enter your token:')
+    TOKEN = input()
+
+    discord = Sender(token=TOKEN)
+    start_process(discord)
+
     time = datetime.now()
     while True:
         if (datetime.now() - time) > timedelta(hours=4, minutes=15):
-            start_process()
+            start_process(discord)
             time = datetime.now()
         else:
             print("Waiting...")
             print(datetime.now() - time)
             sleep(10)
-
-
-

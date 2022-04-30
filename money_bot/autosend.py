@@ -21,7 +21,8 @@ if __name__ == '__main__':
 
     time = datetime.now()
     while True:
-        if (datetime.now() - time) > timedelta(hours=4, minutes=15):
+        delay_minutes = random.randint(10, 30)
+        if (datetime.now() - time) > timedelta(hours=4, minutes=delay_minutes):
             start_process(discord)
             time = datetime.now()
         else:

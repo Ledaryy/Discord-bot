@@ -1,6 +1,4 @@
 import re
-import json
-import random
 from datetime import datetime, timedelta
 from time import sleep
 from discord import Discord
@@ -18,7 +16,6 @@ def get_next_target(discord):
     discord.send_message(BUMP_CHANNEL_ID, "когда")
     sleep(5)
     response = discord.get_latest_messages(BUMP_CHANNEL_ID, 10)
-
     message = message_finder(
         message_json=response,
         author_id=ANIHOUSE_BOT_ID,
@@ -28,17 +25,11 @@ def get_next_target(discord):
     up_time, bump_time, like_time = time_extractor(
         message["embeds"][0]["description"])
 
-    BUMP_NAMES["UP"] = up_time
-    BUMP_NAMES["BUMP"] = bump_time
-    BUMP_NAMES["LIKE"] = like_time
+    times_dict, target = target_matcher_time_utils(
+        up_time, bump_time, like_time, message
+    )
 
-    minimal_time = min(up_time, bump_time, like_time)
-
-    for key, val in BUMP_NAMES.items():
-        if val == minimal_time:
-            next_target = key
-
-    return BUMP_NAMES, next_target
+    return times_dict, target
 
 
 def message_finder(
@@ -150,12 +141,45 @@ def time_extractor(message):
         raise Exception("Cannot find all times, incorrect message.")
 
 
+def target_matcher_time_utils(up_time, bump_time, like_time, body):
+
+    time = datetime.fromisoformat(body['timestamp'])
+    current_time = datetime.now().astimezone()
+
+    BUMP_NAMES["UP"] = (time + up_time) - current_time
+    BUMP_NAMES["BUMP"] = (time + bump_time) - current_time
+    BUMP_NAMES["LIKE"] = (time + like_time) - current_time
+
+    minimal_time = min(
+        BUMP_NAMES["UP"], BUMP_NAMES["BUMP"], BUMP_NAMES["LIKE"])
+
+    for key, val in BUMP_NAMES.items():
+        if val == minimal_time:
+            next_target = key
+        BUMP_NAMES[key] = val.total_seconds()
+
+    return BUMP_NAMES, next_target
+
+
 if __name__ == '__main__':
 
     print('Enter your token:')
     TOKEN = input()
 
     discord = Discord(token=TOKEN)
-    values, target = get_next_target(discord)
 
-    print(values, target)
+    while True:
+
+        values, target = get_next_target(discord)
+
+        for value in values:
+            print(f"{value}: {values[value]}")
+        print(f"Next target: {target}")
+
+        print(f"Waiting {values['LIKE']} seconds")
+
+        sleep(values["LIKE"] + 0.25)
+
+        discord.send_message(BUMP_CHANNEL_ID, "!like")
+
+        sleep(120)

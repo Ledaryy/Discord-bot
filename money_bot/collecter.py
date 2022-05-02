@@ -15,8 +15,8 @@ def start_process(discord):
 
     crime = random.choice([True, False])
     if crime:
-        discord.send_message(WORK_CHANNEL_ID, ",crime")
         sleep(random.randint(10, 30))
+        discord.send_message(WORK_CHANNEL_ID, ",crime")
 
     sleep(random.randint(10, 30))
     discord.send_message(WORK_CHANNEL_ID, ",collect")

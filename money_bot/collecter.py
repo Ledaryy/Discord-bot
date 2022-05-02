@@ -15,6 +15,7 @@ def start_process(discord):
 
     crime = random.choice([True, False])
     if crime:
+        print("Crime!")
         sleep(random.randint(10, 30))
         discord.send_message(WORK_CHANNEL_ID, ",crime")
 

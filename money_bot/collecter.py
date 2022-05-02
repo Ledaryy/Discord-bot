@@ -10,6 +10,11 @@ from settings import (
 def start_process(discord):
     print("Starting process...")
     discord.send_message(WORK_CHANNEL_ID, ",work")
+    
+    crime = random.choice([True, False])
+    if crime:
+        discord.send_message(WORK_CHANNEL_ID, ",crime")
+    
     sleep(random.randint(10, 30))
     discord.send_message(WORK_CHANNEL_ID, ",collect")
 
@@ -23,7 +28,6 @@ if __name__ == '__main__':
     time = datetime.now()
     delay_minutes = random.randint(10, 30)
     # start_process(discord)
-
     while True:
         if (datetime.now() - time) > timedelta(hours=4, minutes=delay_minutes):
             start_process(discord)

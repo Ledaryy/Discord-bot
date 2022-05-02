@@ -38,6 +38,5 @@ if __name__ == '__main__':
             time = datetime.now()
             delay_minutes = random.randint(10, 30)
         else:
-            print("Waiting...")
-            print(datetime.now() - time)
+            print(f"Waiting... {(datetime.now() - time)} remaining")
             sleep(10)

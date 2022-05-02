@@ -58,6 +58,7 @@ if __name__ == '__main__':
         initial_delay_seconds = 60 * 60 * random.randint(1, 3)  # 1-3 hours
         print(f"Initial delay: {initial_delay_seconds / 60 / 60} hours")
         sleep(initial_delay_seconds)
+        start_process(discord)
     else:
         start_process(discord)
 

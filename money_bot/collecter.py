@@ -27,7 +27,11 @@ if __name__ == '__main__':
     discord = Discord(token=TOKEN)
     time = datetime.now()
     delay_minutes = random.randint(10, 30)
-    # start_process(discord)
+    
+    # Initial Delay
+    initial_delay_seconds = 60 * 60 * random.randint(1, 3) # 1-3 hours
+    sleep(initial_delay_seconds)    
+    
     while True:
         if (datetime.now() - time) > timedelta(hours=4, minutes=delay_minutes):
             start_process(discord)

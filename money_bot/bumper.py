@@ -9,13 +9,14 @@ from settings import (
     BUMP_NAMES,
     ANIHOUSE_BOT_ID,
     BOT_NAME_TAG,
-    BUMP_COMMANDS
+    BUMP_COMMANDS,
+    COMMANDS_ENABLED
 )
 
 
 def get_next_target(discord):
     print("Starting process...")
-    # discord.send_message(BUMP_CHANNEL_ID, "когда")
+    discord.send_message(BUMP_CHANNEL_ID, "когда")
     sleep(5)
     response = discord.get_latest_messages(BUMP_CHANNEL_ID, 10)
     message = message_finder(
@@ -182,7 +183,10 @@ if __name__ == '__main__':
         print(f"Waiting {(values[target] + send_delay)} seconds")
         sleep(values[target] + send_delay)
 
-        discord.send_message(BUMP_CHANNEL_ID, BUMP_COMMANDS[target])
-        print(f"{BUMP_COMMANDS[target]} used!")
+        if target in COMMANDS_ENABLED:  
+            discord.send_message(BUMP_CHANNEL_ID, BUMP_COMMANDS[target])
+            print(f"{BUMP_COMMANDS[target]} used!")
+        else:
+            print(f"Target: {target} was skipped")
 
         sleep(random.randint(10, 30))

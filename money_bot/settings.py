@@ -10,13 +10,15 @@ ANIHOUSE_BOT_ID = os.environ['ANIHOUSE_BOT_ID']
 BOT_NAME_TAG = os.environ['BOT_NAME_TAG']
 
 BUMP_NAMES = {
-    "UP": "S.up", 
-    "BUMP": "Bump", 
+    "UP": "S.up",
+    "BUMP": "Bump",
     "LIKE": "Like"
-    }
+}
 
 BUMP_COMMANDS = {
-    "UP": "!up", 
-    "BUMP": "!bump", 
+    "UP": "!up",
+    "BUMP": "!bump",
     "LIKE": "!like"
 }
+
+COMMANDS_ENABLED = ["LIKE"]

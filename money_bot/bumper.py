@@ -1,3 +1,4 @@
+import random
 import re
 from datetime import datetime, timedelta
 from time import sleep
@@ -7,13 +8,14 @@ from settings import (
     BUMP_CHANNEL_ID,
     BUMP_NAMES,
     ANIHOUSE_BOT_ID,
-    BOT_NAME_TAG
+    BOT_NAME_TAG,
+    BUMP_COMMANDS
 )
 
 
 def get_next_target(discord):
     print("Starting process...")
-    discord.send_message(BUMP_CHANNEL_ID, "когда")
+    # discord.send_message(BUMP_CHANNEL_ID, "когда")
     sleep(5)
     response = discord.get_latest_messages(BUMP_CHANNEL_ID, 10)
     message = message_finder(
@@ -145,20 +147,20 @@ def target_matcher_time_utils(up_time, bump_time, like_time, body):
 
     time = datetime.fromisoformat(body['timestamp'])
     current_time = datetime.now().astimezone()
-
-    BUMP_NAMES["UP"] = (time + up_time) - current_time
-    BUMP_NAMES["BUMP"] = (time + bump_time) - current_time
-    BUMP_NAMES["LIKE"] = (time + like_time) - current_time
+    times_dict = BUMP_NAMES
+    times_dict["UP"] = (time + up_time) - current_time
+    times_dict["BUMP"] = (time + bump_time) - current_time
+    times_dict["LIKE"] = (time + like_time) - current_time
 
     minimal_time = min(
-        BUMP_NAMES["UP"], BUMP_NAMES["BUMP"], BUMP_NAMES["LIKE"])
+        times_dict["UP"], times_dict["BUMP"], times_dict["LIKE"])
 
-    for key, val in BUMP_NAMES.items():
+    for key, val in times_dict.items():
         if val == minimal_time:
             next_target = key
-        BUMP_NAMES[key] = val.total_seconds()
+        times_dict[key] = val.total_seconds()
 
-    return BUMP_NAMES, next_target
+    return times_dict, next_target
 
 
 if __name__ == '__main__':
@@ -173,13 +175,14 @@ if __name__ == '__main__':
         values, target = get_next_target(discord)
 
         for value in values:
-            print(f"{value}: {values[value]}")
+            print(f"{value}: {values[value]}s remaining")
         print(f"Next target: {target}")
 
-        print(f"Waiting {values['LIKE']} seconds")
+        send_delay = 0.05
+        print(f"Waiting {(values[target] + send_delay)} seconds")
+        sleep(values[target] + send_delay)
 
-        sleep(values["LIKE"] + 0.25)
+        discord.send_message(BUMP_CHANNEL_ID, BUMP_COMMANDS[target])
+        print(f"{BUMP_COMMANDS[target]} used!")
 
-        discord.send_message(BUMP_CHANNEL_ID, "!like")
-
-        sleep(120)
+        sleep(random.randint(10, 30))

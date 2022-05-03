@@ -14,3 +14,9 @@ BUMP_NAMES = {
     "BUMP": "Bump", 
     "LIKE": "Like"
     }
+
+BUMP_COMMANDS = {
+    "UP": "!up", 
+    "BUMP": "!bump", 
+    "LIKE": "!like"
+}

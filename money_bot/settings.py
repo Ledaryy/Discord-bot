@@ -22,3 +22,5 @@ BUMP_COMMANDS = {
 }
 
 COMMANDS_ENABLED = ["LIKE"]
+
+LOGGER_FORMAT = "[%(asctime)s] :: %(levelname)s :: %(filename)s :: %(funcName)s :: %(lineno)s :: %(message)s"

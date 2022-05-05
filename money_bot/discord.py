@@ -4,7 +4,7 @@ import json
 
 class Discord():
 
-    def __init__(self, token):
+    def __init__(self, token=None):
         self.token = token
 
     def send_message(self, channel_id, message):

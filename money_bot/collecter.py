@@ -51,11 +51,11 @@ if __name__ == '__main__':
 
     discord = Discord(token=TOKEN)
     time = datetime.now()
-    delay_minutes = random.randint(10, 30)
+    delay_minutes = round(random.uniform(0, 30), 5) # 0-30 minutes, 5 decimal places
 
     # Initial Delay
     if DELAY:
-        initial_delay_seconds = 60 * 60 * random.randint(1, 3)  # 1-3 hours
+        initial_delay_seconds = 60 * 60 * round(random.uniform(0,3), 5)  # 0-3 hours, 5 decimals places
         print(f"Initial delay: {initial_delay_seconds / 60 / 60} hours")
         sleep(initial_delay_seconds)
         start_process(discord)

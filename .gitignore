@@ -4,3 +4,4 @@ __pycache__/
 keys/
 TOKENS.md
 money_bot/temp.json
+money_bot/webhost/db.sqlite3

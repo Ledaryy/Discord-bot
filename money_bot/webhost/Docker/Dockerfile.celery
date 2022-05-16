@@ -1,0 +1,35 @@
+# Python
+FROM python:3.10-slim-buster
+
+# Environment variables
+ENV C_FORCE_ROOT true
+
+# Install packages
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    build-essential \
+    python3-dev \
+    python3-pip \
+    python3-setuptools \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Python packages
+RUN mkdir /code
+WORKDIR /code
+ADD requirements.txt /code/
+
+RUN pip install --upgrade pip \
+     && pip install setuptools \
+     && pip install --no-cache-dir -r requirements.txt
+
+
+# Tools
+COPY . /code/
+
+# Entrypoint
+COPY Docker/entrypoint.celery.sh /usr/local/bin
+RUN chmod u+x /usr/local/bin/entrypoint.celery.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.celery.sh"]

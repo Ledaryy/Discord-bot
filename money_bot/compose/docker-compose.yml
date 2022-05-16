@@ -36,14 +36,14 @@ services:
   #   volumes:
   #     - ../webhost:/code
 
-  # celery:
-  #   restart: always
-  #   image: celery_local_file
-  #   build:
-  #     context: ../webhost
-  #     dockerfile: ./Docker/Dockerfile.celery
-  #   depends_on:
-  #     - redis
+  celery:
+    restart: always
+    image: discord_bot/celery
+    build:
+      context: ../webhost
+      dockerfile: ./Docker/Dockerfile.celery
+    depends_on:
+      - redis
 
   flower:  
     image: mher/flower

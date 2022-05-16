@@ -6,6 +6,7 @@ class Bot(models.Model):
     name = models.CharField(max_length=100)
     token = models.CharField(max_length=100)
     money = models.ForeignKey("backend.Money", verbose_name="bot", on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=False)
     
     def __str__(self):
         return self.name

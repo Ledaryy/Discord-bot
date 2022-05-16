@@ -1,9 +1,9 @@
 
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -18,6 +18,8 @@ WORK_CHANNEL_ID = os.environ['WORK_CHANNEL_ID']
 BUMP_CHANNEL_ID = os.environ['BUMP_CHANNEL_ID']
 ANIHOUSE_BOT_ID = os.environ['ANIHOUSE_BOT_ID']
 BOT_NAME_TAG = os.environ['BOT_NAME_TAG']
+PRODUCTION = True if os.environ['PRODUCTION'] else False
+DEBUG = True if os.environ['DEBUG'] else False
 
 BUMP_NAMES = {
     "UP": "S.up",
@@ -85,17 +87,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'webhost.wsgi.application'
 
+# Database =====================================================================
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgrespw",
+        "NAME": "bodytrakn",
+        "USER": "iamin",
+        "PASSWORD": "",
         "HOST": "localhost",
         "PORT": 5432,
     }
 }
+
+DATABASES["default"] = dj_database_url.parse(
+    os.environ["POSTGRES_LOCAL_CONN"], conn_max_age=600, ssl_require=False
+)
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {

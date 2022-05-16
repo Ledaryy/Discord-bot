@@ -1,6 +1,10 @@
 # Python
 FROM python:3.10-slim-buster
 
+# Environment variables
+ENV C_FORCE_ROOT true
+
+# Install packages
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     build-essential \
@@ -9,6 +13,12 @@ RUN apt-get update \
     python3-setuptools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+
+# Python packages
+RUN mkdir /code
+WORKDIR /code
+ADD requirements.txt /code/
 
 RUN pip install --upgrade pip \
      && pip install setuptools \

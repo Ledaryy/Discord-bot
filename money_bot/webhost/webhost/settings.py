@@ -12,6 +12,7 @@ import os
 SECRET_KEY = os.environ.get('SECRET_KEY')
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 DEBUG = int(os.environ.get("DEBUG", default=0))
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
 
 # Deployment
 WORK_CHANNEL_ID = os.environ.get("WORK_CHANNEL_ID")

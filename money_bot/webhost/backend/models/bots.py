@@ -33,9 +33,7 @@ class Bot(models.Model):
 
         # 0-30 minutes, 5 decimal places
         delay_minutes = round(random.uniform(0, 30), 5)
-        # return timedelta(hours=4, minutes=delay_minutes).total_seconds()
-        # TODO set to timedelta logic
-        return 30
+        return timedelta(hours=4, minutes=delay_minutes).total_seconds()
 
     def start(self, delay=0):
         # Starts auto collect chain

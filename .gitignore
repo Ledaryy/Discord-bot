@@ -7,3 +7,5 @@ money_bot/webhost/db.sqlite3
 money_bot/webhost/static/
 money_bot/webhost/staticfiles/
 .env*
+money_bot/compose/get_images_from_the_hub.sh
+money_bot/compose/push_images_to_hub.sh

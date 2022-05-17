@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Bot, Money
+from .models import Bot, MoneyLog
 
 class BotForm(forms.Form):
     comment = forms.CharField(

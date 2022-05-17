@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Bot, Money
+from .models import Bot, MoneyLog
 
 from django.utils.html import format_html
 from django.urls import path, reverse
@@ -9,7 +9,7 @@ from django.template.response import TemplateResponse
 
 from .forms import StartBot, StopBot
 
-admin.site.register(Money)
+admin.site.register(MoneyLog)
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):

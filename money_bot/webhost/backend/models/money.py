@@ -1,14 +1,14 @@
 from django.db import models
 
-class Money(models.Model):
+class MoneyLog(models.Model):
     
-    bot = models.ForeignKey(
+    owner = models.OneToOneField(
         "Bot",
-        verbose_name="money",
+        related_name="money",
         on_delete=models.CASCADE
     )
-    balance = models.IntegerField(default=0)
-    total_earned = models.IntegerField(default=0)
-    
+    earned = models.IntegerField(default=0)
+    date = models.DateTimeField(auto_now_add=True)
+        
     def __str__(self):
-        return str(self.balance)
+        return f"{self.owner} - {self.date} - {self.earned}"

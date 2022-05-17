@@ -3,5 +3,5 @@ from .bots import (
 )
 
 from .money import (
-    Money,
+    MoneyLog,
 )

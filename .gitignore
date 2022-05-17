@@ -1,4 +1,3 @@
-.env
 node_modules/
 __pycache__/
 keys/
@@ -6,3 +5,5 @@ TOKENS.md
 money_bot/temp.json
 money_bot/webhost/db.sqlite3
 money_bot/webhost/static/
+money_bot/webhost/staticfiles/
+.env*

@@ -5,21 +5,19 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-ALLOWED_HOSTS = []
 
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+# Django
+SECRET_KEY = os.environ.get('SECRET_KEY')
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+DEBUG = int(os.environ.get("DEBUG", default=0))
 
-#TOKEN = os.environ['TOKEN']
-SECRET_KEY = os.environ['SECRET_KEY']
-WORK_CHANNEL_ID = os.environ['WORK_CHANNEL_ID']
-BUMP_CHANNEL_ID = os.environ['BUMP_CHANNEL_ID']
-ANIHOUSE_BOT_ID = os.environ['ANIHOUSE_BOT_ID']
-BOT_NAME_TAG = os.environ['BOT_NAME_TAG']
-PRODUCTION = True if os.environ['PRODUCTION'] else False
-DEBUG = True if os.environ['DEBUG'] else False
+# Deployment
+WORK_CHANNEL_ID = os.environ.get("WORK_CHANNEL_ID")
+BUMP_CHANNEL_ID = os.environ.get("BUMP_CHANNEL_ID")
+ANIHOUSE_BOT_ID = os.environ.get("ANIHOUSE_BOT_ID")
+BOT_NAME_TAG = os.environ.get("BOT_NAME_TAG")
 
 BUMP_NAMES = {
     "UP": "S.up",
@@ -121,9 +119,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -133,13 +128,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

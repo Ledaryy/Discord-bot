@@ -2,7 +2,7 @@ import celery
 from django.db import models
 
 
-class BotTypes(models.TextChoices):
+class BotRoles(models.TextChoices):
     disabled = "disabled", "disabled"
     collecter = "collecter", "collecter"
     bumper = "bumper", "bumper"
@@ -14,14 +14,22 @@ class Bot(models.Model):
     token = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
 
-    bot_type = models.CharField(
+    role = models.CharField(
         max_length=100,
-        choices=BotTypes.choices,
-        default=BotTypes.disabled,
+        choices=BotRoles.choices,
+        default=BotRoles.disabled,
     )
 
     balance = models.IntegerField(default=0)
     total_earned = models.IntegerField(default=0)
+
+    def get_collecter_delay_in_seconds(self):
+        import random
+        from datetime import timedelta
+        
+        # 0-30 minutes, 5 decimal places
+        delay_minutes = round(random.uniform(0, 30), 5)
+        return timedelta(hours=4, minutes=delay_minutes).seconds()
 
     def __str__(self):
         return self.name

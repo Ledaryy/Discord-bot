@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import Bot
-from .models.bots import BotTypes
+from .models.bots import BotRoles
 
 class BotForm(forms.Form):
     delay = forms.IntegerField(
@@ -33,19 +33,19 @@ class BotForm(forms.Form):
 
 class StartBot(BotForm):
 
-    bot_type = forms.ChoiceField(
+    role = forms.ChoiceField(
         required=True,
         help_text="Starts diffrent type of the bot",
-        choices=BotTypes.choices
+        choices=BotRoles.choices
     )
     
     field_order = (
         'delay',
-        'bot_type',
+        'role',
     )
     def form_action(self, bot):    
         print(f"Start bot {bot}")    
-        bot.bot_type = self.cleaned_data['bot_type']
+        bot.bot_type = self.cleaned_data['role']
         bot.save()
         return bot.start(delay=self.cleaned_data['delay'])
     

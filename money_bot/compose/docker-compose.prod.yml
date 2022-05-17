@@ -59,8 +59,7 @@ services:
 
   flower:  
     image: mher/flower
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - FLOWER_PORT=8888
+    env_file:
+      - ../webhost/.env.prod.flower
     ports:  
       - "8888:8888"

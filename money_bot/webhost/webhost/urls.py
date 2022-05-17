@@ -19,6 +19,7 @@ from django.shortcuts import redirect
 from django.urls import path
 from django.views.generic.base import RedirectView
 
+admin.site.site_header = 'Ledary Bots Admin Panel'
 
 urlpatterns = [
     path('', RedirectView.as_view(url='admin/', permanent=False), name='index'),

@@ -26,6 +26,8 @@ class Discord():
         }
 
         r = requests.post(**request_body)
+        if r.status_code != "200":
+            print(f"Request wasnt sent: [{message}], response: [{r}]")
         print(f"Message sent: [{message}], response: [{r.status_code}]")
         
         

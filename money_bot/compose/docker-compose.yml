@@ -5,13 +5,14 @@ volumes:
 
 services:
 
+
   db:
     image: kartoza/postgis:11.5-2.8
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     env_file:
-      - ../webhost/.env
+      - ../webhost/.env.dev.db
     ports:
       - "5433:5432"
 
@@ -35,6 +36,8 @@ services:
       - db
     volumes:
       - ../webhost:/code
+    env_file:
+      - ../webhost/.env.dev
 
   celery:
     restart: always
@@ -44,6 +47,8 @@ services:
       dockerfile: ./Docker/Dockerfile.celery
     depends_on:
       - redis
+    env_file:
+      - ../webhost/.env.dev
 
   flower:  
     image: mher/flower

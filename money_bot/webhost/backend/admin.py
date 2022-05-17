@@ -11,6 +11,7 @@ from .forms import StartBot, StopBot
 
 admin.site.register(MoneyLog)
 
+
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
     date_heirarchy = (
@@ -19,90 +20,93 @@ class BotAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'token',
-        'is_active', 
+        'balance',
+        'total_earned',
+        'bot_type',
+        'is_active',
+        'bot_actions',
     )
-    # readonly_fields = (
-    #     'id',
-    #     'name',
-    #     'token',
-    #     'money',
-    #     'is_active', 
-    # )
-     
+    readonly_fields = (
+        'id',
+        'total_earned',
+        'is_active',
+    )
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path(
-                r'^(?P<account_id>.+)/deposit/$',
-                self.admin_site.admin_view(self.process_deposit),
-                name='account-deposit',
+                '<int:bot_id>/start/',
+                self.admin_site.admin_view(self.start_bot),
+                name='start-bot',
             ),
             path(
-                r'^(?P<account_id>.+)/withdraw/$',
-                self.admin_site.admin_view(self.process_withdraw),
-                name='account-withdraw',
+                '<int:bot_id>/stop/',
+                self.admin_site.admin_view(self.stop_bot),
+                name='stop-bot',
             ),
         ]
         return custom_urls + urls
-    def account_actions(self, obj):
+
+    def bot_actions(self, obj):
         return format_html(
-            '<a class="button" href="{}">Deposit</a>&nbsp;'
-            '<a class="button" href="{}">Withdraw</a>',
-            reverse('admin:account-deposit', args=[obj.pk]),
-            reverse('admin:account-withdraw', args=[obj.pk]),
+            '<a class="button" href="{}">Start</a>&nbsp;'
+            '<a class="button" href="{}">Stop</a>',
+            reverse('admin:start-bot', args=[obj.id]),
+            reverse('admin:stop-bot', args=[obj.id]),
         )
-    account_actions.short_description = 'Account Actions'
-    account_actions.allow_tags = True
-    
-    
-    def process_deposit(self, request, account_id, *args, **kwargs):
+    bot_actions.short_description = 'Bot Actions'
+    bot_actions.allow_tags = True
+
+    def start_bot(self, request, bot_id, *args, **kwargs):
         return self.process_action(
             request=request,
-            account_id=account_id,
+            bot_id=bot_id,
             action_form=StartBot,
-            action_title='Deposit',
+            action_title='Start',
         )
-    def process_withdraw(self, request, account_id, *args, **kwargs):
-            return self.process_action(
-                request=request,
-                account_id=account_id,
-                action_form=StopBot,
-                action_title='Withdraw',
-            )
-        
+
+    def stop_bot(self, request, bot_id, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            bot_id=bot_id,
+            action_form=StopBot,
+            action_title='Stop',
+        )
+
     def process_action(
             self,
             request,
-            account_id,
+            bot_id,
             action_form,
             action_title
     ):
-            account = self.get_object(request, account_id)
-            if request.method != 'POST':
-                form = action_form()
-            else:
-                form = action_form(request.POST)
-                if form.is_valid():
-                    try:
-                        form.save(account, request.user)
-                    except errors.Error as e:
-                        # If save() raised, the form will a have a non
-                        # field error containing an informative message.
-                        pass
-                    else:
-                        self.message_user(request, 'Success')
-                        url = reverse(
-                            'admin:account_account_change',
-                        args=[account.pk],
-                            current_app=self.admin_site.name,
-                        )
-                        return HttpResponseRedirect(url)
-            context = self.admin_site.each_context(request)
-            context['opts'] = self.model._meta
-            context['form'] = form
-            context['account'] = account
-            context['title'] = action_title
-            return HttpResponse(
-                code = 500
-            )
+        bot = self.get_object(request, bot_id)
+        
+        if request.method != 'POST':
+            form = action_form()
+        else:
+            form = action_form(request.POST)
+            if form.is_valid():
+                try:
+                    form.save(bot)
+                except Exception as e:
+                    print(e)
+                else:
+                    self.message_user(request, 'Success')
+                    url = reverse(
+                        'admin:backend_bot_changelist',
+                        current_app=self.admin_site.name,
+                    )
+                    return HttpResponseRedirect(url)
+
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        context['form'] = form
+        context['bot_id'] = bot.id
+        context['title'] = action_title
+        return TemplateResponse(
+            request,
+            'admin/account/bot_action.html',
+            context,
+        )

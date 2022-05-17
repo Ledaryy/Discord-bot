@@ -1,70 +1,56 @@
 from django import forms
 
-from .models import Bot, MoneyLog
+from .models import Bot
+from .models.bots import BotTypes
 
 class BotForm(forms.Form):
-    comment = forms.CharField(
+    delay = forms.IntegerField(
+        min_value=0,
+        max_value=600,
         required=False,
-        widget=forms.Textarea,
+        initial=0,
+        help_text="Delay for current action in minutes",
     )
-    send_email = forms.BooleanField(
-        required=False,
-    )
+    def save(self, bot):
+        try:
+            self.form_action(bot)
+        except Exception as e:
+            error_message = str(e)
+            self.add_error(None, error_message)
+            raise
+        # if self.cleaned_data.get('send_email', False):
+        #     send_email(
+        #         to=[account.user.email],
+        #         subject_template=self.email_subject_template,
+        #         body_template=self.email_body_template,
+        #         context={
+        #             "account": account,
+        #             "action": action,
+        #         }
+        #     )
+        # return account, action
+    
 
 class StartBot(BotForm):
-    amount = forms.IntegerField(
-        min_value=0,
-        max_value=1000000,
+
+    bot_type = forms.ChoiceField(
         required=True,
-        help_text='How much to withdraw?',
+        help_text="Starts diffrent type of the bot",
+        choices=BotTypes.choices
     )
-    email_body_template = 'email/account/withdraw.txt'
+    
     field_order = (
-        'amount',
-        'comment',
-        'send_email',
+        'delay',
+        'bot_type',
     )
-    def form_action(self, account, user):
-        # return Account.withdraw(
-        #     id=account.pk,
-        #     user=account.user,
-        #     amount=self.cleaned_data['amount'],
-        #     withdrawn_by=user,
-        #     comment=self.cleaned_data['comment'],
-        #     asof=timezone.now(),
-        # )
-        return True
+    def form_action(self, bot):    
+        print(f"Start bot {bot}")    
+        bot.bot_type = self.cleaned_data['bot_type']
+        bot.save()
+        return bot.start(delay=self.cleaned_data['delay'])
     
 class StopBot(BotForm):
-    amount = forms.IntegerField(
-        min_value=0,
-        max_value=1000000,
-        required=True,
-        help_text="How much to deposit?",
-    )
-    reference_type = forms.ChoiceField(
-        required=True,
-    )
-    reference = forms.CharField(
-        required=False,
-    )
-    email_body_template = 'email/account/deposit.txt'
-    field_order = (
-        'amount',
-        'reference_type',
-        'reference',
-        'comment',
-        'send_email',
-    )
-    def form_action(self, account, user):
-        # return Account.deposit(
-        #     id=account.pk,
-        #     user=account.user,
-        #     amount=self.cleaned_data['amount'],
-        #     deposited_by=user,
-        #     reference=self.cleaned_data['reference'],
-        #     reference_type=self.cleaned_data['reference_type'],
-        #     comment=self.cleaned_data['comment'],
-        #     asof=timezone.now(),
-        # )
-        return True
+    
+    def form_action(self, bot):
+        return bot.stop(delay=self.cleaned_data['delay'])
+        

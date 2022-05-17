@@ -45,7 +45,7 @@ class StartBot(BotForm):
     )
     def form_action(self, bot):    
         print(f"Start bot {bot}")    
-        bot.bot_type = self.cleaned_data['role']
+        bot.role = self.cleaned_data['role']
         bot.save()
         return bot.start(delay=self.cleaned_data['delay'])
     

@@ -1,59 +1,38 @@
 import random
-import argparse
 import logging
 from datetime import datetime, timedelta
 from time import sleep
-from discord import Discord
-from settings import (
+from utils.discord import Discord
+from webhost.settings import (
     WORK_CHANNEL_ID,
     LOGGER_FORMAT
 )
 
+logger = logging.getLogger(__name__)
 
-logging.basicConfig(format=LOGGER_FORMAT, level=logging.INFO)
 
 
 class BotCollecter(Discord):
 
-    def __init__(self, delay=False):
+    def __init__(self, delay=False, bot=None):
         self.delay = delay
+        self.bot = bot
         self.collecter_time = datetime.now()
-        self.init_arg_parser()
-
-    def init_arg_parser(self):
-        parser = argparse.ArgumentParser(description='Collecter module')
-        parser.add_argument('-d', '--no_delay',
-                            help='Removes initial delay', required=False)
-        parser.add_argument('-t', '--token', help='Adds token', required=False)
-
-        args = vars(parser.parse_args())
-
-        self.token = None if not args['token'] else args['token']
-        self.delay = False if args['no_delay'] else True
-
-        if self.token:
-            logging.info(f"Token was provided")
-        else:
-            logging.info(
-                f"Please provide token '-t <token>' or enter it here:")
-            self.TOKEN = input()
-
-        if not self.delay:
-            logging.info("Initial delay was skipped")
+        # self.init_arg_parser()
 
     def collect(self):
-        logging.info(f"Collect loop started")
+        logger.info(f"Collect loop started")
 
-        self.send_message(WORK_CHANNEL_ID, ",work")
+        # self.send_message(WORK_CHANNEL_ID, ",work")
 
-        crime = random.choice([True, False])
-        if crime:
-            logging.debug("Crime function triggered")
-            sleep(random.randint(10, 30))
-            self.send_message(WORK_CHANNEL_ID, ",crime")
+        # crime = random.choice([True, False])
+        # if crime:
+        #     logging.debug("Crime function triggered")
+        #     sleep(random.randint(10, 30))
+        #     self.send_message(WORK_CHANNEL_ID, ",crime")
 
-        sleep(random.randint(10, 30))
-        self.send_message(WORK_CHANNEL_ID, ",collect")
+        # sleep(random.randint(10, 30))
+        # self.send_message(WORK_CHANNEL_ID, ",collect")
 
     def initial_delay(self):
         if self.delay:

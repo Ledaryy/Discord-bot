@@ -28,12 +28,11 @@ class Discord():
             "data": payload,
             "headers": headers
         }
-        print(request_body)
-        print(requests.post(**request_body))
+
         r = requests.post(**request_body)
-        logger.debug(f"Request sent: message: [{message}], response: [{r.status_code}]")
+
         if r.status_code != 200:
-            print(f"Request wasnt sent: [{message}], response: [{r}]")
+            print(f"Request wasnt sent: [{message}], response: [{r.status_code}]")
         print(f"Message sent: [{message}], response: [{r.status_code}]")
         
         

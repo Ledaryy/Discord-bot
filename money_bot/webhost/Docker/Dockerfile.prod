@@ -19,7 +19,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Netcat for sh scripts
-RUN apt-get install netcat -y
+RUN apt-get install netcat
 
 
 # Python packages

@@ -10,6 +10,7 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     build-essential \
+    netcat \
     python3-dev \
     python3-pip \
     gcc \
@@ -17,10 +18,6 @@ RUN apt-get update \
     python3-setuptools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Netcat for sh scripts
-RUN apt-get install netcat
-
 
 # Python packages
 RUN mkdir /code

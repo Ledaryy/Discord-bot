@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 from django import forms
 
 from .models import Bot
@@ -43,8 +44,11 @@ class StartBot(BotForm):
         'delay',
         'role',
     )
+
     def form_action(self, bot):    
         print(f"Start bot {bot}")    
+        if bot.is_active:
+            raise Exception("Bot is already active")
         bot.role = self.cleaned_data['role']
         bot.save()
         return bot.start(delay=self.cleaned_data['delay'])
@@ -52,5 +56,7 @@ class StartBot(BotForm):
 class StopBot(BotForm):
     
     def form_action(self, bot):
+        if not bot.is_active:
+            raise Exception('Bot is already inactive')
         return bot.stop(delay=self.cleaned_data['delay'])
         

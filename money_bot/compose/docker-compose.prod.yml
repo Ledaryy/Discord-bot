@@ -60,7 +60,8 @@ services:
 
   flower:  
     image: mher/flower
-    command: ['flower', '--broker=redis://redis:6379', '--port=8888', '--url_prefix=flower']
+    env_file:
+      - ../webhost/.env.prod.flower
     ports:  
       - "8888:8888"
     depends_on:

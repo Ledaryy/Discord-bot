@@ -2,9 +2,20 @@ version: '2.4'
 
 volumes:
   postgres_data:
+  static_volume:
 
 services:
 
+  nginx:
+    image: discord_bot/nginx
+    build: ../webhost/nginx
+    volumes:
+      - static_volume:/code/staticfiles
+    ports:
+      - 80:80
+    depends_on:
+      - web
+      - flower
 
   db:
     image: kartoza/postgis:11.5-2.8
@@ -28,14 +39,14 @@ services:
     build:
       context: ../webhost
       dockerfile: ./Docker/Dockerfile.local
-    ports:
-      - "127.0.0.1:8000:8000"
-      - "80:80"
+    expose:
+      - 8000
     depends_on:
       - redis
       - db
     volumes:
       - ../webhost:/code
+      - static_volume:/code/staticfiles
     env_file:
       - ../webhost/.env.dev
 
@@ -56,3 +67,6 @@ services:
       - ../webhost/.env.dev.flower
     ports:  
       - "8888:8888"
+    depends_on:
+      - redis
+      - celery

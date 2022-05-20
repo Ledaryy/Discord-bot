@@ -1,5 +1,6 @@
 import uuid
 import logging
+import celery
 
 from celery import shared_task
 from .models import Bot
@@ -63,13 +64,13 @@ def _start_bot(bot_id: int):
     if bot.role == BotRoles.disabled:
         logger.info(f"This bot is disabled: {bot}")
     if bot.role == BotRoles.collecter:
-        start_send_collect_money(bot_id)
+        send_and_reschedule_collect(bot_id)
         
     logger.info(f"Finished background start bot task {bot_id}")
 
 
 @shared_task()
-def start_send_collect_money(bot_id: int):
+def send_and_reschedule_collect(bot_id: int):
     logger.info(f"Started background collect task for bot {bot_id}")
 
     bot = Bot.objects.get(id=bot_id)
@@ -83,14 +84,14 @@ def start_send_collect_money(bot_id: int):
         bot_cache['collecter']['active'] = True
         cache.set(f"bot_{bot.id}", bot_cache)
         
-        reshedule_send_task(bot)
+        reschedule_collect_task(bot)
     else:
         logger.info(f"Finished collect task for bot {bot}")
 
     logger.info(f"Finished background collect task for bot {bot_id}")
 
 
-def reshedule_send_task(bot: Bot):
+def reschedule_collect_task(bot: Bot):
     logger.info(f"Started reshedule background collect task for bot {bot}")
 
     delay = bot.get_collecter_delay_in_seconds()
@@ -108,12 +109,13 @@ def reshedule_send_task(bot: Bot):
     
     logger.info(f"Cache resh task: {bot_cache}")
     
-    start_send_collect_money.apply_async(
-        eta=eta,
-        task_id=task_uniq_id,
+    celery.current_app.send_task(
+        name="backend.tasks.send_and_reschedule_collect",
         kwargs={
             "bot_id": bot.id,
         },
+        task_id=task_uniq_id,
+        eta=eta,
     )
 
     logger.info(f"Finished reshedule background collect task for bot {bot}")

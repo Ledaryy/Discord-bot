@@ -30,7 +30,7 @@ class BotCollecter(DiscordAndSearch, Extractor):
         logger.info(f"Collect finished")
 
     def collect_work(self):
-        # self.send_message(WORK_CHANNEL_ID, ",work")
+        self.send_message(WORK_CHANNEL_ID, ",work")
 
         sleep(random.randint(5, 10))
         message = self.get_latest_money_bot_message(

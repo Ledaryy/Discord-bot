@@ -14,25 +14,6 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 DEBUG = int(os.environ.get("DEBUG", default=0))
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
 
-# Deployment
-WORK_CHANNEL_ID = os.environ.get("WORK_CHANNEL_ID")
-BUMP_CHANNEL_ID = os.environ.get("BUMP_CHANNEL_ID")
-ANIHOUSE_BOT_ID = os.environ.get("ANIHOUSE_BOT_ID")
-BOT_NAME_TAG = os.environ.get("BOT_NAME_TAG")
-
-BUMP_NAMES = {
-    "UP": "S.up",
-    "BUMP": "Bump",
-    "LIKE": "Like"
-}
-
-BUMP_COMMANDS = {
-    "UP": "!up",
-    "BUMP": "!bump",
-    "LIKE": "!like"
-}
-
-COMMANDS_ENABLED = ["LIKE"]
 
 LOGGER_FORMAT = "[%(asctime)s] :: %(levelname)s :: %(filename)s :: %(funcName)s :: %(lineno)s :: %(message)s"
 

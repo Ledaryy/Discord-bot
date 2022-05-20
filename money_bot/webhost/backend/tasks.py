@@ -6,10 +6,7 @@ from celery import shared_task
 from .models import Bot
 from .models.bots import Bot, BotRoles
 
-from time import sleep
-from django.core.cache import cache
 from datetime import datetime, timedelta
-# from webhost.utils.discord import Discord
 
 from .bots.collecter import BotCollecter, BotCollecterCacheManager
 
@@ -66,7 +63,7 @@ def send_and_reschedule_collect(bot_id: int):
 
     if bot.is_active:
         bot_collecter = BotCollecter(bot)
-        bot_collecter.send_collect()
+        bot_collecter.collect()
 
         reschedule_collect_task(bot)
     else:

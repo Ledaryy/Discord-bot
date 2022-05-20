@@ -14,4 +14,4 @@ class ErrorLog(models.Model):
     body = models.TextField()
 
     def __str__(self):
-        return f"{self.date} - {self.message}"
+        return f"{self.owner} - {self.date} - {self.comment}"

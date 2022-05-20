@@ -5,3 +5,7 @@ from .bots import (
 from .money import (
     MoneyLog,
 )
+
+from .error import (
+    ErrorLog,
+)

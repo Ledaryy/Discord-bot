@@ -9,12 +9,12 @@ from backend.settings import (
 )
 from django.core.cache import cache
 from datetime import datetime
-from backend.models import MoneyLog
+from backend.models import MoneyLog, ErrorLog
 
 logger = logging.getLogger(__name__)
 
 
-class BotCollecter(DiscordAndSearch):
+class BotCollecter(DiscordAndSearch, Extractor):
 
     def __init__(self, bot=None):
         self.bot = bot
@@ -38,7 +38,19 @@ class BotCollecter(DiscordAndSearch):
             UNBELIEVABOAT_BOT_ID,
             self.bot.name
             )
-        print(message)
+        if message:
+            value = self.extract_money_value(message)
+            if value:
+                self.save_money(value)
+            else:
+                logger.info(f"No money found in message: {message}")
+                error = ErrorLog(
+                    owner=self.bot,
+                    comment="No money found in message",
+                    body=message
+                )
+                error.save()
+            
 
     def collect_crime(self):
         crime = random.choice([True, False])

@@ -63,14 +63,21 @@ class DiscordAndSearch(Discord):
     ):
         
         response_json = self.get_latest_messages(channel_id, limit=100)
+        if response_json:
+            bot_messages = self.search_for_author(response_json, author_id)
+        else:
+            return None
         
-        bot_messages = self.search_for_author(response_json, author_id)
+        if bot_messages:
+            mentioned_by_bot_messages = self.search_mentioned_in_embeds(bot_messages, bot_name)
+        else:
+            return None
         
-        mentioned_by_bot_messages = self.search_mentioned_in_embeds(bot_messages, bot_name)
-                
-        sorted_by_newest = self.sort_by_newest(mentioned_by_bot_messages)
-        
-        return sorted_by_newest[0]        
+        if mentioned_by_bot_messages:
+            sorted_by_newest = self.sort_by_newest(mentioned_by_bot_messages)
+            return sorted_by_newest[0]        
+        else:
+            return None
     
     def search_for_author(self, response_json, author_id):
         

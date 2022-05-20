@@ -62,7 +62,7 @@ class DiscordAndSearch(Discord):
         bot_name
     ):
         
-        response_json = self.get_latest_messages(channel_id, limit=100)
+        response_json = self.get_latest_messages(channel_id, limit=20)
         if response_json:
             bot_messages = self.search_for_author(response_json, author_id)
         else:

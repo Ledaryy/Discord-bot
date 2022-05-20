@@ -3,7 +3,7 @@ from django.db import models
 
 class MoneyLog(models.Model):
 
-    owner = models.OneToOneField(
+    owner = models.ForeignKey(
         "Bot",
         related_name="money",
         on_delete=models.CASCADE

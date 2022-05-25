@@ -10,3 +10,4 @@ webhost/staticfiles/
 compose/get_images_from_the_hub.sh
 compose/push_images_to_hub.sh
 *.log
+webhost/nginx/.htpasswd

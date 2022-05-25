@@ -1,6 +1,7 @@
 
 from pathlib import Path
 import dj_database_url
+from pytz import UTC
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +24,7 @@ CELERY_RESULT_BACKEND = 'redis://redis:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Europe/London'
+CELERY_ENABLE_UTC = True
 
 # Application definition
 

@@ -10,9 +10,11 @@ class MoneyLog(models.Model):
     )
     earned = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
+    
+    comment = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.owner} - {self.date} - {self.earned}"
+        return f"{self.owner} - {self.date} - {self.earned} - {self.comment}"
 
     def save(self, *args, **kwargs):
 

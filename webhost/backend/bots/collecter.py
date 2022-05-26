@@ -41,7 +41,7 @@ class BotCollecter(DiscordAndSearch, Extractor):
         if message:
             value = self.extract_money_value(message)
             if value:
-                self.save_money(value)
+                self.save_money(value, "Earned by using [work] command")
             else:
                 logger.info(f"No money found in message: {message}")
                 error = ErrorLog(
@@ -70,10 +70,11 @@ class BotCollecter(DiscordAndSearch, Extractor):
         sleep(random.randint(5, 10))
         self.send_message(WORK_CHANNEL_ID, ",collect")
 
-    def save_money(self, value):
+    def save_money(self, value, comment):
         money = MoneyLog(
             owner=self.bot,
-            earned=value
+            earned=value,
+            comment=comment
         )
         money.save()
 

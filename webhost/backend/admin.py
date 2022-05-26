@@ -1,17 +1,17 @@
 from django.contrib import admin
-from .models import Bot, MoneyLog, ErrorLog
+from backend.models import Bot, Balance, MoneyLog, ErrorLog
 
 from django.utils.html import format_html
 from django.urls import path, reverse
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 
 from .forms import StartBot, StopBot
 
 admin.site.register(MoneyLog)
 admin.site.register(ErrorLog)
-
+admin.site.register(Balance)
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
@@ -21,15 +21,12 @@ class BotAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'balance',
-        'total_earned',
         'role',
         'is_active',
         'bot_actions',
     )
     readonly_fields = (
         'id',
-        'total_earned',
         'is_active',
     )
 

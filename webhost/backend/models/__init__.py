@@ -3,6 +3,7 @@ from .bots import (
 )
 
 from .money import (
+    Balance,
     MoneyLog,
 )
 

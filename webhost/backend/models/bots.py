@@ -1,6 +1,8 @@
 import celery
 from django.db import models
 
+from .money import Balance
+
 
 class BotRoles(models.TextChoices):
     disabled = "disabled", "disabled"
@@ -20,9 +22,6 @@ class Bot(models.Model):
         choices=BotRoles.choices,
         default=BotRoles.disabled,
     )
-
-    balance = models.IntegerField(default=0)
-    total_earned = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -46,4 +45,7 @@ class Bot(models.Model):
             "backend.tasks.stop_bot", args=(self.id, delay))
 
     def save(self, *args, **kwargs):
+        
+        Balance.objects.get_or_create(owner=self)
+
         super().save(*args, **kwargs)

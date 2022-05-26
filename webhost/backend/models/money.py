@@ -2,11 +2,6 @@ from django.db import models
 
 
 class Balance(models.Model):
-    owner = models.OneToOneField(
-        "Bot",
-        related_name="balance",
-        on_delete=models.CASCADE
-    )
 
     pocket_balance = models.IntegerField(default=0)
     bank_balance = models.IntegerField(default=0)
@@ -26,7 +21,7 @@ class Balance(models.Model):
         return self.work_earned + self.collect_earned + self.crime_earned
 
     def __str__(self):
-        return f"{self.owner} - {self.pocket_balance} - {self.bank_balance} - {self.total_balance}"
+        return f"{self.bot} | P: {self.pocket_balance}  |  B: {self.bank_balance}  |  T: {self.total_balance}"
 
 
 class MoneyLog(models.Model):

@@ -22,6 +22,7 @@ class BotAdmin(admin.ModelAdmin):
         'id',
         'name',
         'role',
+        'balance',
         'is_active',
         'bot_actions',
     )

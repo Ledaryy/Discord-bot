@@ -22,10 +22,17 @@ class Bot(models.Model):
         choices=BotRoles.choices,
         default=BotRoles.disabled,
     )
+        
+    balance = models.OneToOneField(
+        "Balance",
+        related_name="bot",
+        on_delete=models.CASCADE,
+        default=Balance.objects.create().pk,
+    )
 
     def __str__(self):
         return self.name
-
+    
     def get_collecter_delay_in_seconds(self):
         import random
         from datetime import timedelta
@@ -46,6 +53,4 @@ class Bot(models.Model):
 
     def save(self, *args, **kwargs):
         
-        Balance.objects.get_or_create(owner=self)
-
         super().save(*args, **kwargs)

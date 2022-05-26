@@ -50,6 +50,13 @@ class BotCollecter(DiscordAndSearch, Extractor):
                     body=message
                 )
                 error.save()
+        else:
+            logger.info(f"No message found")
+            error = ErrorLog(
+                owner=self.bot,
+                comment="No message found"
+            )
+            error.save()
             
 
     def collect_crime(self):

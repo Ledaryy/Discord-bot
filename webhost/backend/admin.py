@@ -1,5 +1,5 @@
 from django.contrib import admin
-from backend.models import Bot, Balance, MoneyLog, ErrorLog
+from backend.models import Bot, Balance, MoneyLog, ErrorLog, TaskSchedule
 
 from django.utils.html import format_html
 from django.urls import path, reverse
@@ -12,6 +12,7 @@ from .forms import StartBot, StopBot
 admin.site.register(MoneyLog)
 admin.site.register(ErrorLog)
 admin.site.register(Balance)
+admin.site.register(TaskSchedule)
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):

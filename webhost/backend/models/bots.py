@@ -2,6 +2,7 @@ import celery
 from django.db import models
 
 from .money import Balance
+from .schedule import TaskSchedule
 
 
 class BotRoles(models.TextChoices):
@@ -30,17 +31,18 @@ class Bot(models.Model):
         blank=True,
         null=True,
     )
+    
+    schedule = models.OneToOneField(
+        "TaskSchedule",
+        related_name="bot",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+        
 
     def __str__(self):
         return self.name
-
-    def get_collecter_delay_in_seconds(self):
-        import random
-        from datetime import timedelta
-
-        # 0-30 minutes, 5 decimal places
-        delay_minutes = round(random.uniform(0, 30), 5)
-        return timedelta(hours=4, minutes=delay_minutes).total_seconds()
 
     def start(self, delay=0):
         # Starts auto collect chain
@@ -56,4 +58,7 @@ class Bot(models.Model):
         if not self.balance:
             self.balance = Balance.objects.create()
             self.balance.save()
+        if not self.schedule:
+            self.schedule = TaskSchedule.objects.create()
+            self.schedule.save()
         super().save(*args, **kwargs)

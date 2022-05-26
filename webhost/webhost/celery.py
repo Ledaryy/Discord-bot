@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import os
+from celery.schedules import crontab
 from celery import Celery
 from django.conf import settings
 
@@ -12,3 +13,11 @@ app = Celery('webhost')
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+app.conf.beat_schedule = {
+     'every_5_min_check_and_send_tasks_from_db': {
+        'task': 'backend.tasks.schedule_tasks',
+        'schedule': crontab(hour="*", minute="*", day_of_week="*"),
+    }
+}
+
+app.conf.timezone = 'UTC'

@@ -20,15 +20,6 @@ class BotCollecter(DiscordAndSearch, Extractor):
         self.bot = bot
         self.token = bot.token
 
-    def collect(self):
-        logger.info(f"Collect started")
-
-        self.collect_work()
-        # self.collect_crime()
-        # self.collect_collect_daily()
-
-        logger.info(f"Collect finished")
-
     def collect_work(self):
         self.send_message(WORK_CHANNEL_ID, ",work")
 
@@ -60,14 +51,9 @@ class BotCollecter(DiscordAndSearch, Extractor):
             
 
     def collect_crime(self):
-        crime = random.choice([True, False])
-        sleep(random.randint(5, 10))
-        if crime:
-            logger.info("Crime function triggered")
-            self.send_message(WORK_CHANNEL_ID, ",crime")
+        self.send_message(WORK_CHANNEL_ID, ",crime")
 
     def collect_collect_daily(self):
-        sleep(random.randint(5, 10))
         self.send_message(WORK_CHANNEL_ID, ",collect")
 
 

@@ -60,3 +60,14 @@ class StopBot(BotForm):
             raise Exception('Bot is already inactive')
         return bot.stop(delay=self.cleaned_data['delay'])
         
+class MoneyForm(forms.Form):
+    amount = forms.IntegerField(
+        min_value=0,
+        max_value=100000,
+        required=True,
+        initial=0,
+        help_text="This is just a template",
+    )
+    def save(self, bot):
+        print("Save money")
+        # return bot.add_money(self.cleaned_data['amount'])

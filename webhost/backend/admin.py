@@ -7,7 +7,7 @@ from django.urls import path, reverse
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 
-from .forms import StartBot, StopBot
+from .forms import StartBot, StopBot, MoneyForm
 
 admin.site.register(MoneyLog)
 admin.site.register(ErrorLog)
@@ -23,10 +23,11 @@ class BotAdmin(admin.ModelAdmin):
         'id',
         'name',
         'role',
-        'balance',
-        'task_schedule',
         'is_active',
         'bot_actions',
+        'display_balance',
+        'balance_actions',
+        'display_task_schedule',
     )
     readonly_fields = (
         'id',
@@ -46,8 +47,84 @@ class BotAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.stop_bot),
                 name='stop-bot',
             ),
+            path(
+                '<int:bot_id>/deposit/',
+                self.admin_site.admin_view(self.deposit_balance),
+                name='deposit-balance',
+            ),
+            path(
+                '<int:bot_id>/withdraw/',
+                self.admin_site.admin_view(self.withdraw_balance),
+                name='withdraw-balance',
+            ),
+            path(
+                '<int:bot_id>/transfer/',
+                self.admin_site.admin_view(self.transfer_balance),
+                name='transfer-balance',
+            )
         ]
         return custom_urls + urls
+    
+    def display_balance(self, obj):
+        if obj.balance:
+            return format_html(
+                '<textarea style="height: 5em; width: 15em;" readonly>{}</textarea>',
+                obj.balance.get_balance_display(),
+            )
+        else:
+            return '-'
+    display_balance.short_description = 'Bot Balance'
+
+    def display_task_schedule(self, obj):
+        if obj.task_schedule:
+            return format_html(
+                '<textarea style="height: 5em; width: 15em;" readonly>{}</textarea>',
+                obj.task_schedule.get_schedule_display(),
+            )
+        else:
+            return '-'
+    display_task_schedule.short_description = 'Tasks Schedule'
+        
+    def balance_actions(self, obj):
+        return format_html(
+            '<a class="button" href="{}">Deposit</a>'
+            '<br>'
+            '<br>'
+            '<a class="button" href="{}">Withdraw</a>&nbsp;'
+            '<br>'
+            '<br>'
+            '<a class="button" href="{}">Transfer</a>',
+            reverse('admin:deposit-balance', args=[obj.id]),
+            reverse('admin:withdraw-balance', args=[obj.id]),
+            reverse('admin:transfer-balance', args=[obj.id]),
+        )
+        
+    balance_actions.short_description = 'Balance Actions'
+    balance_actions.allow_tags = True
+        
+    def deposit_balance(self, request, bot_id, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            bot_id=bot_id,
+            action_title='Deposit',
+            action_form=MoneyForm,
+        )
+        
+    def withdraw_balance(self, request, bot_id, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            bot_id=bot_id,
+            action_title='Withdraw',
+            action_form=MoneyForm,
+        )
+    
+    def transfer_balance(self, request, bot_id, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            bot_id=bot_id,
+            action_title='Transfer',
+            action_form=MoneyForm,
+        )
 
     def bot_actions(self, obj):
         return format_html(

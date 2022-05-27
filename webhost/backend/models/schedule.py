@@ -51,5 +51,9 @@ class TaskSchedule(models.Model):
         self.next_collect_task = self.get_eta_delay_for_hours(24)
         self.save()
         
+    def get_schedule_display(self):
+        template = "%b %d %X"
+        return f"Work: {self.next_work_task.strftime(template)} \nCrime: {self.next_crime_task.strftime(template)} \nCollect: {self.next_collect_task.strftime(template)}"
+        
     def __str__(self):
-        return f"work: {self.next_work_task.strftime('%X')} - crime: {self.next_crime_task.strftime('%X')} - collect: {self.next_collect_task.strftime('%X')}"
+        return f"{self.bot} - work: {self.next_work_task} - crime: {self.next_crime_task} - collect: {self.next_collect_task}"

@@ -26,8 +26,11 @@ class Balance(models.Model):
     def total_earned(self):
         return self.work_earned + self.collect_earned + self.crime_earned
 
+    def get_balance_display(self):
+        return f"Pocket: {self.pocket_balance}  \nBank: {self.bank_balance}  \nTotal: {self.total_balance} \nTotal Earned: {self.total_earned}"
+
     def __str__(self):
-        return f"P: {self.pocket_balance}  |  B: {self.bank_balance}  |  T: {self.total_balance}"
+        return f"{self.bot} | P: {self.pocket_balance}  |  B: {self.bank_balance}  |  T: {self.total_balance}"
 
 
 class MoneyLog(models.Model):

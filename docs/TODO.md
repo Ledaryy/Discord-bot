@@ -1,4 +1,7 @@
 # Features
+0. Resend feature
+    - If servers responds with 403, resend the request with the same data.
+    - Cleanup the delays in collect and schedule functions
 1. Bot Money bank and actions
     - Money transfer button and logic
     - Money withdraw button and logic

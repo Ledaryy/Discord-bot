@@ -5,6 +5,12 @@ from datetime import datetime, timedelta, timezone
 
 class TaskSchedule(models.Model):
     
+    bot = models.OneToOneField(
+        "Bot",
+        related_name="task_schedule",
+        on_delete=models.CASCADE,
+    )
+    
     next_work_task = models.DateTimeField(auto_now_add=True)
     next_crime_task = models.DateTimeField(auto_now_add=True)
     next_collect_task = models.DateTimeField(auto_now_add=True)
@@ -46,4 +52,4 @@ class TaskSchedule(models.Model):
         self.save()
         
     def __str__(self):
-        return f"{self.bot} - work: {self.next_work_task} - crime: {self.next_crime_task} - collect: {self.next_collect_task}"
+        return f"work: {self.next_work_task.strftime('%X')} - crime: {self.next_crime_task.strftime('%X')} - collect: {self.next_collect_task.strftime('%X')}"

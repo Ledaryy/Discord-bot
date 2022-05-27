@@ -23,23 +23,6 @@ class Bot(models.Model):
         choices=BotRoles.choices,
         default=BotRoles.disabled,
     )
-    
-    balance = models.OneToOneField(
-        "Balance",
-        related_name="bot",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    
-    schedule = models.OneToOneField(
-        "TaskSchedule",
-        related_name="bot",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-        
 
     def __str__(self):
         return self.name
@@ -55,10 +38,19 @@ class Bot(models.Model):
             "backend.tasks.stop_bot", args=(self.id, delay))
 
     def save(self, *args, **kwargs):
-        if not self.balance:
-            self.balance = Balance.objects.create()
-            self.balance.save()
-        if not self.schedule:
-            self.schedule = TaskSchedule.objects.create()
-            self.schedule.save()
         super().save(*args, **kwargs)
+        
+        # Move to the create function
+        
+        try:
+            self.balance
+        except Balance.DoesNotExist:
+            self.balance = Balance.objects.create(bot=self)
+            self.balance.save()
+        
+        try:
+            self.task_schedule
+        except TaskSchedule.DoesNotExist:
+            self.task_schedule = TaskSchedule.objects.create(bot=self)
+            self.task_schedule.save()
+

@@ -49,7 +49,7 @@ def _start_bot(bot_id: int):
         logger.info(f"This bot is disabled: {bot}")
         
     if bot.role == BotRoles.collecter:
-        bot.schedule.start_all()
+        bot.task_schedule.start_all()
         
 
     logger.info(f"Finished background start bot task for bot: {bot_id}")
@@ -119,7 +119,7 @@ def schedule_tasks():
             
             if bot.role == BotRoles.collecter:
                 
-                diff = bot.schedule.next_work_task - datetime.now(timezone.utc)                
+                diff = bot.task_schedule.next_work_task - datetime.now(timezone.utc)                
                 if diff < timedelta(minutes=2):
                     celery.current_app.send_task(
                         name="backend.tasks.execute_tasks",
@@ -127,11 +127,11 @@ def schedule_tasks():
                             "bot_id": bot.id,
                             "tasks_list": ["work"],
                         },
-                        eta=bot.schedule.next_work_task,
+                        eta=bot.task_schedule.next_work_task,
                     )
-                    bot.schedule.reschedule_work()
+                    bot.task_schedule.reschedule_work()
                     
-                diff = bot.schedule.next_crime_task - datetime.now(timezone.utc)                
+                diff = bot.task_schedule.next_crime_task - datetime.now(timezone.utc)                
                 if diff < timedelta(minutes=2):
                     celery.current_app.send_task(
                         name="backend.tasks.execute_tasks",
@@ -139,11 +139,11 @@ def schedule_tasks():
                             "bot_id": bot.id,
                             "tasks_list": ["crime"],
                         },
-                        eta=bot.schedule.next_crime_task,
+                        eta=bot.task_schedule.next_crime_task,
                     )
-                    bot.schedule.reschedule_crime()
+                    bot.task_schedule.reschedule_crime()
                     
-                diff = bot.schedule.next_collect_task - datetime.now(timezone.utc)                
+                diff = bot.task_schedule.next_collect_task - datetime.now(timezone.utc)                
                 if diff < timedelta(minutes=2):
                     celery.current_app.send_task(
                         name="backend.tasks.execute_tasks",
@@ -151,9 +151,9 @@ def schedule_tasks():
                             "bot_id": bot.id,
                             "tasks_list": ["collect"],
                         },
-                        eta=bot.schedule.next_collect_task,
+                        eta=bot.task_schedule.next_collect_task,
                     )
-                    bot.schedule.rechedule_collect()
+                    bot.task_schedule.rechedule_collect()
                                             
                     
     logger.info("Finished background schedule tasks")

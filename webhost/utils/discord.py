@@ -1,4 +1,5 @@
 import logging
+import re
 from time import sleep
 import requests
 import json
@@ -35,20 +36,19 @@ class Discord():
             print(
                 f"Request sent: message: [{message}], response: [{r.status_code}]")
             retries += 1
-
-            if r.status_code == 429:
-                json_response = json.loads(r.text)
+            json_response = json.loads(r.text)
+            
+            if retries >= 5:
+                return False, json_response
+            elif r.status_code == 429:
                 sleep(json_response["retry_after"])
                 print(
-                    f"Retrying after {json_response['retry_after']} seconds, for message: [{message}]")
+                    f"Retrying after {json_response['retry_after']} seconds, for message: [{message}], retries: [{retries}]"
+                )
             elif r.status_code == 200:
-                break
-            elif retries > 5:
-                # TODO: log error
-                break
+                return True, None
             else:
-                # TODO: log error
-                break
+                return False, json_response
 
     def get_latest_messages(self, channel_id, limit=50):
 

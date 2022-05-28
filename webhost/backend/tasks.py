@@ -3,7 +3,7 @@ import logging
 import celery
 
 from celery import shared_task
-from .models import Bot
+from .models import ErrorLog
 from .models.bots import Bot, BotRoles
 
 from datetime import datetime, timedelta, timezone
@@ -80,7 +80,17 @@ def _send_message(bot_id: int, message: str):
     bot = Bot.objects.get(id=bot_id)
     _bot = BotTools(bot)
 
-    _bot.send_message(WORK_CHANNEL_ID, message)
+    success, error = _bot.send_message(WORK_CHANNEL_ID, message)
+    
+    if not success:
+        logger.error(f"Error while sending message: {error}")
+        error_log = ErrorLog(
+            owner=bot,
+            comment="Error while sending message to the chat",
+            body=error
+        )
+        error_log.save()
+            
 
     logger.info(f"Finished background send message for bot: {bot_id}")
 

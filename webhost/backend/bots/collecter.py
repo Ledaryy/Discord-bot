@@ -21,33 +21,43 @@ class BotTools(DiscordAndSearch, Extractor):
         self.token = bot.token
 
     def collect_work(self):
-        self.send_message(WORK_CHANNEL_ID, ",work")
+        success, error_body = self.send_message(WORK_CHANNEL_ID, ",work")
 
-        sleep(5)
-        message = self.get_latest_money_bot_message(
-            WORK_CHANNEL_ID,
-            UNBELIEVABOAT_BOT_ID,
-            self.bot.name
-        )
-        if message:
-            value = self.extract_money_value(message)
-            if value:
-                MoneyLog.save_work(self.bot, value)
+        if success:
+            logger.info(f"Successfully collected work")
+            sleep(5)
+            message = self.get_latest_money_bot_message(
+                WORK_CHANNEL_ID,
+                UNBELIEVABOAT_BOT_ID,
+                self.bot.name
+            )
+            if message:
+                value = self.extract_money_value(message)
+                if value:
+                    MoneyLog.save_work(self.bot, value)
+                else:
+                    logger.info(f"No money found in message: {message}")
+                    error = ErrorLog(
+                        owner=self.bot,
+                        comment="No money found in message",
+                        body=message
+                    )
+                    error.save()
             else:
-                logger.info(f"No money found in message: {message}")
+                logger.info(f"No message found")
                 error = ErrorLog(
                     owner=self.bot,
-                    comment="No money found in message",
-                    body=message
+                    comment="No message found"
                 )
                 error.save()
         else:
-            logger.info(f"No message found")
             error = ErrorLog(
                 owner=self.bot,
-                comment="No message found"
+                comment="Error while collecting work",
+                body=error_body
             )
             error.save()
+            
 
     def collect_crime(self):
         self.send_message(WORK_CHANNEL_ID, ",crime")

@@ -1,6 +1,6 @@
 # Features
 0. [DONE] Resend feature
-    - If servers responds with 403, resend the request with the same data.
+    - If servers responds with 429, resend the request with the same data.
     - Cleanup the delays in collect and schedule functions
 1. [DONE] Send message function
     - Sends following message to the current channel:

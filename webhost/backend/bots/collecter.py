@@ -22,9 +22,18 @@ class BotTools(DiscordAndSearch, Extractor):
 
     def collect_work(self):
         success, error_body = self.send_message(WORK_CHANNEL_ID, ",work")
+        self.save_result(success, error_body, "work")
+        
+    def collect_crime(self):
+        success, error_body = self.send_message(WORK_CHANNEL_ID, ",crime")
+        self.save_result(success, error_body, "crime")
 
+    def collect_collect_daily(self):
+        self.send_message(WORK_CHANNEL_ID, ",collect")
+        
+    def save_result(self, success, error_body, operation):
         if success:
-            logger.info(f"Successfully collected work")
+            logger.info(f"Successfully collected {operation}")
             sleep(5)
             message = self.get_latest_money_bot_message(
                 WORK_CHANNEL_ID,
@@ -32,14 +41,22 @@ class BotTools(DiscordAndSearch, Extractor):
                 self.bot.name
             )
             if message:
-                value = self.extract_money_value(message)
-                if value:
-                    MoneyLog.save_work(self.bot, value)
+                
+                if operation == "work":
+                    value = self.extract_work_money_value(message)
+                    if value:
+                        MoneyLog.save_work(self.bot, value)
+                if operation == "crime":
+                    sucess, value = self.extract_crime_money_value(message)
+                    if value:
+                        MoneyLog.save_crime(self.bot, sucess, value)
+                    
+                
                 else:
                     logger.info(f"No money found in message: {message}")
                     error = ErrorLog(
                         owner=self.bot,
-                        comment="No money found in message",
+                        comment=f"No money found in message, operation: {operation}",
                         body=message
                     )
                     error.save()
@@ -53,17 +70,10 @@ class BotTools(DiscordAndSearch, Extractor):
         else:
             error = ErrorLog(
                 owner=self.bot,
-                comment="Error while collecting work",
+                comment=f"Error while completing {operation}",
                 body=error_body
             )
             error.save()
-            
-
-    def collect_crime(self):
-        self.send_message(WORK_CHANNEL_ID, ",crime")
-
-    def collect_collect_daily(self):
-        self.send_message(WORK_CHANNEL_ID, ",collect")
 
 
 class BotCollecterCacheManager():

@@ -40,7 +40,7 @@ class MoneyLog(models.Model):
         related_name="money_log",
         on_delete=models.CASCADE
     )
-    earned = models.IntegerField(default=0)
+    value = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
 
     comment = models.TextField(blank=True)
@@ -52,7 +52,7 @@ class MoneyLog(models.Model):
         
         log = MoneyLog(
             owner=owner,
-            earned=earned,
+            value=earned,
             comment="Earned by using [work] command"
         )
         
@@ -64,6 +64,29 @@ class MoneyLog(models.Model):
         
         balance.save()
         
+    def save_crime(owner, sucess, value):
+        
+        balance = log.owner.balance
+        
+        if sucess:
+            log = MoneyLog(
+                owner=owner,
+                value=value,
+                comment="Earned by using [crime] command"
+            )
+            balance.pocket_balance += value
+            balance.crime_earned += value
+        else:
+            log = MoneyLog(
+                owner=owner,
+                value=value,
+                comment="Loss by using [crime] command"
+            )
+            balance.pocket_balance -= value
+            balance.crime_loss += value
+            
+        log.save()
+        balance.save()
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

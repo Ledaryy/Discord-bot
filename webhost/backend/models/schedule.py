@@ -11,9 +11,9 @@ class TaskSchedule(models.Model):
         on_delete=models.CASCADE,
     )
 
+    next_collect_task = models.DateTimeField(auto_now_add=True)
     next_work_task = models.DateTimeField(auto_now_add=True)
     next_crime_task = models.DateTimeField(auto_now_add=True)
-    next_collect_task = models.DateTimeField(auto_now_add=True)
 
     def start_all(self):
         # Fixed delay for 180 seconds, needed for the first task

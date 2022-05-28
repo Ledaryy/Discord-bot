@@ -1,4 +1,3 @@
-
 import re
 
 
@@ -27,3 +26,18 @@ class Extractor():
         else:
             raise Exception("Unknown color code")
         return success, money_value
+
+    def extract_collect_money_value(self, message):
+        fields = message["embeds"][0]["fields"]
+
+        cash = fields[0]["value"]
+        numbers_cash = re.findall(r'\d+', f"{cash}")
+        clear_number_cash = numbers_cash[1:]
+        cash_values = int("".join(clear_number_cash))
+
+        bank = fields[1]["value"]
+        numbers_bank = re.findall(r'\d+', f"{bank}")
+        clear_number_bank = numbers_bank[1:]
+        bank_values = int("".join(clear_number_bank))
+
+        return cash_values, bank_values

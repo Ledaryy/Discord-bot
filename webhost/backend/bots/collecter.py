@@ -29,8 +29,19 @@ class BotTools(DiscordAndSearch, Extractor):
         self.save_result(success, error_body, "crime")
 
     def collect_collect_daily(self):
-        self.send_message(WORK_CHANNEL_ID, ",collect")
-        
+        success_coll, error_body_coll = self.send_message(WORK_CHANNEL_ID, ",collect")
+        success_bal, error_body_bal = self.send_message(WORK_CHANNEL_ID, ",bal")
+        if success_coll and success_bal:
+            self.save_result(True, error_body_bal, "collect")
+        else:
+            error_body = error_body_coll + error_body_bal
+            error = ErrorLog(
+                owner=self.bot,
+                comment=f"Error while collecting daily",
+                body=error_body
+            )
+            error.save()   
+                         
     def save_result(self, success, error_body, operation):
         if success:
             logger.info(f"Successfully collected {operation}")
@@ -46,12 +57,14 @@ class BotTools(DiscordAndSearch, Extractor):
                     value = self.extract_work_money_value(message)
                     if value:
                         MoneyLog.save_work(self.bot, value)
-                if operation == "crime":
+                elif operation == "crime":
                     sucess, value = self.extract_crime_money_value(message)
                     if value:
                         MoneyLog.save_crime(self.bot, sucess, value)
-                    
-                
+                elif operation == "collect":
+                    cash, bank = self.extract_collect_money_value(message)
+                    if cash and bank:
+                        MoneyLog.save_collect(self.bot, cash, bank)
                 else:
                     logger.info(f"No money found in message: {message}")
                     error = ErrorLog(

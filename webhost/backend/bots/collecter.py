@@ -45,7 +45,7 @@ class BotTools(DiscordAndSearch, Extractor):
     def save_result(self, success, error_body, operation):
         if success:
             logger.info(f"Successfully collected {operation}")
-            sleep(5)
+            sleep(3)
             message = self.get_latest_money_bot_message(
                 WORK_CHANNEL_ID,
                 UNBELIEVABOAT_BOT_ID,
@@ -59,7 +59,7 @@ class BotTools(DiscordAndSearch, Extractor):
                         MoneyLog.save_work(self.bot, value)
                 elif operation == "crime":
                     sucess, value = self.extract_crime_money_value(message)
-                    if value:
+                    if sucess and value:
                         MoneyLog.save_crime(self.bot, sucess, value)
                 elif operation == "collect":
                     cash, bank = self.extract_collect_money_value(message)
@@ -89,54 +89,60 @@ class BotTools(DiscordAndSearch, Extractor):
             error.save()
 
 
-class BotCollecterCacheManager():
+class BotCacheManager():
 
     CACHE_TEMPLATE = {
-        "bot_name": None,
         "bot_id": None,
-        "started_at": datetime.now(),
-        "collecter": {
-            "active": False,
-            "next_task_id": None,
-            "next_task_eta": None,
-            "next_task_eta_seconds": None,
+        "bot_name": None,
+        "reserve_chat": {
+            "reserved": False,
+            "reason": None,
+            "time": datetime.now(),
         }
     }
 
     def __init__(self, bot):
         self.bot = bot
-        self.cache_key = f"bot_{self.bot.id}_collecter"
+        self.cache_key = f"CACHE_{self.bot.id}"
 
         self.cache = cache.get(self.cache_key)
         if self.cache is None:
             self.cache = self.CACHE_TEMPLATE
-            self.cache["bot_name"] = self.bot.name
             self.cache["bot_id"] = self.bot.id
+            self.cache["bot_name"] = self.bot.name
             cache.set(self.cache_key, self.cache)
             logger.info(f"Cache created: {self.cache}")
         else:
             logger.info(f"Cache found: {self.cache}")
 
-    def start_collecter(self):
+    def reserve(self, reason):
+        logger.info("Reserving chat")
         self.cache = cache.get(self.cache_key)
-        self.cache["collecter"]["active"] = True
+        
+        self.cache["reserve_chat"]["reserved"] = True
+        self.cache["reserve_chat"]["reason"] = reason
+        self.cache["reserve_chat"]["time"] = datetime.now()
+        
         cache.set(self.cache_key, self.cache)
-
+        
+    def release(self):
+        logger.info("Releasing chat")
+        self.cache = cache.get(self.cache_key)
+        
+        self.cache["reserve_chat"]["reserved"] = False
+        self.cache["reserve_chat"]["reason"] = None
+        self.cache["reserve_chat"]["time"] = datetime.now()
+        
+        cache.set(self.cache_key, self.cache)
+        
     @property
-    def collecter_active(self):
+    def is_reserved(self):
         self.cache = cache.get(self.cache_key)
-        return self.cache["collecter"]["active"]
-
-    def set_next_collect_task(self, task_id, task_eta, delay):
+        return self.cache["reserve_chat"]["reserved"]
+    
+    def refresh_cache(self):
         self.cache = cache.get(self.cache_key)
-        self.cache["collecter"]["next_task_id"] = task_id
-        self.cache["collecter"]["next_task_eta"] = task_eta
-        self.cache["collecter"]["next_task_eta_seconds"] = delay
-        cache.set(self.cache_key, self.cache)
-
-    def get_next_collect_task(self):
-        self.cache = cache.get(self.cache_key)
-        return self.cache["collecter"]["next_task_id"]
+        logger.info(f"Cache refreshed: {self.cache}")
 
     def delete_cache(self):
         cache.delete(self.cache_key)

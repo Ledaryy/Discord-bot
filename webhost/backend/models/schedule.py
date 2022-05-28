@@ -1,6 +1,6 @@
-import random
 from django.db import models
 from datetime import datetime, timedelta, timezone
+from django.utils import timezone as django_timezone
 
 
 class TaskSchedule(models.Model):
@@ -11,9 +11,9 @@ class TaskSchedule(models.Model):
         on_delete=models.CASCADE,
     )
 
-    next_collect_task = models.DateTimeField(auto_now_add=True)
-    next_work_task = models.DateTimeField(auto_now_add=True)
-    next_crime_task = models.DateTimeField(auto_now_add=True)
+    next_collect_task = models.DateTimeField(blank=True, default=django_timezone.now)
+    next_work_task = models.DateTimeField(blank=True, default=django_timezone.now)
+    next_crime_task = models.DateTimeField(blank=True, default=django_timezone.now)
 
     def start_all(self):
         # Fixed delay for 180 seconds, needed for the first task
@@ -22,9 +22,9 @@ class TaskSchedule(models.Model):
         self.next_work_task = datetime.now(
             timezone.utc) + timedelta(seconds=delay)
         self.next_crime_task = datetime.now(
-            timezone.utc) + timedelta(seconds=delay)
+            timezone.utc) + timedelta(seconds=delay+1)
         self.next_collect_task = datetime.now(
-            timezone.utc) + timedelta(seconds=delay)
+            timezone.utc) + timedelta(seconds=delay+2)
 
         self.save()
 
@@ -50,7 +50,7 @@ class TaskSchedule(models.Model):
         self.save()
 
     def rechedule_collect(self):
-        self.next_collect_task = self.get_eta_delay_for_hours(24)
+        self.next_collect_task = self.get_eta_delay_for_hours(16)
         self.save()
 
     def get_schedule_display(self):

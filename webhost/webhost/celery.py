@@ -14,7 +14,7 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
-     'every_5_min_check_and_send_tasks_from_db': {
+     'every_1_min_check_and_send_tasks_from_db': {
         'task': 'backend.tasks.schedule_tasks',
         'schedule': crontab(hour="*", minute="*", day_of_week="*"),
     }

@@ -27,13 +27,13 @@ class Balance(models.Model):
     
     @property
     def total_earned(self):
-        return self.work_earned + self.collect_earned + self.crime_earned
+        return self.work_earned + self.collect_earned + self.crime_earned - self.crime_loss + self.text_earned
 
     def get_balance_display(self):
-        return f"Pocket: {self.cash_balance}  \nBank: {self.bank_balance}  \nTotal: {self.total_balance} \nTotal Earned: {self.total_earned}"
+        return f"Cash: {self.cash_balance}  \nBank: {self.bank_balance}  \nTotal: {self.total_balance} \nTotal Earned: {self.total_earned}"
 
     def __str__(self):
-        return f"{self.bot} | P: {self.cash_balance}  |  B: {self.bank_balance}  |  T: {self.total_balance}"
+        return f"{self.bot} | C: {self.cash_balance}  |  B: {self.bank_balance}  |  T: {self.total_balance}"
 
 
 class MoneyLog(models.Model):
@@ -49,7 +49,7 @@ class MoneyLog(models.Model):
     comment = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.owner} - {self.date} - {self.earned} - {self.comment}"
+        return f"{self.owner} - {self.date} - {self.value} - {self.comment}"
 
     def save_work(owner, earned):
         

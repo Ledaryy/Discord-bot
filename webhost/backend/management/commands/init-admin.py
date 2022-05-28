@@ -14,17 +14,17 @@ from django.core.management.base import BaseCommand
 
 from django.contrib.auth.models import AbstractUser
 
-
-class Command(BaseCommand):
-    help = "Initialize admin user (only for development)"
+# TODO rework this
+# class Command(BaseCommand):
+#     help = "Initialize admin user (only for development)"
     
-    def handle(self, *args, **options):
-        if not AbstractUser.objects.filter(username="root").exists():
-            AbstractUser.objects.create(
-                "root", "root@example.com", "123456"
-            )
-            print(
-                "Superuser created. Username: root, password: 123456"
-            )
-        else:
-            print("Admin Account Already Exists")
+#     def handle(self, *args, **options):
+#         if not AbstractUser.objects.filter(username="root").exists():
+#             AbstractUser.objects.create_superuser(
+#                 "root", "root@example.com", "123456"
+#             )
+#             print(
+#                 "Superuser created. Username: root, password: 123456"
+#             )
+#         else:
+#             print("Admin Account Already Exists")

@@ -1,4 +1,5 @@
-import uuid
+from time import sleep
+import random
 import logging
 import celery
 
@@ -8,7 +9,7 @@ from .models.bots import Bot, BotRoles
 
 from datetime import datetime, timedelta, timezone
 
-from .bots.collecter import BotTools, BotCollecterCacheManager
+from .bots.collecter import BotTools, BotCacheManager
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ def _send_message(bot_id: int, message: str):
     _bot = BotTools(bot)
 
     success, error = _bot.send_message(WORK_CHANNEL_ID, message)
-    
+
     if not success:
         logger.error(f"Error while sending message: {error}")
         error_log = ErrorLog(
@@ -90,7 +91,6 @@ def _send_message(bot_id: int, message: str):
             body=error
         )
         error_log.save()
-            
 
     logger.info(f"Finished background send message for bot: {bot_id}")
 
@@ -104,6 +104,21 @@ def execute_tasks(bot_id: int, tasks_list: list):
 
     if bot.is_active:
         bot_collecter = BotTools(bot)
+        cache_manager = BotCacheManager(bot)
+
+        if cache_manager.is_reserved:
+            while cache_manager.is_reserved:
+                logger.info(
+                    f"Chat is reserved, Bot {bot} with task {tasks_list} is on hold, waiting...")
+                delay_seconds = round(random.uniform(3, 15), 5)
+                sleep(delay_seconds)
+                cache_manager.refresh_cache()
+            else:
+                logger.info(
+                    f"Chat is free, Bot {bot} with task {tasks_list} is ready to work")
+                cache_manager.reserve(tasks_list)
+        else:
+            cache_manager.reserve(tasks_list)
 
         if "work" in tasks_list:
             bot_collecter.collect_work()
@@ -113,6 +128,8 @@ def execute_tasks(bot_id: int, tasks_list: list):
 
         if "crime" in tasks_list:
             bot_collecter.collect_crime()
+
+        cache_manager.release()
 
     else:
         logger.info(f"Bot is not active, task execution skipped: {bot}")

@@ -15,6 +15,9 @@ class Extractor():
     def extract_crime_money_value(self, message):
         line = message["embeds"][0]["description"]
         color_code = message["embeds"][0]["color"]
+        
+        if "You cannot" in line:
+            return None, None
 
         numbers = re.findall(r'\d+', f"{line}")
         money_value = int(numbers[1])

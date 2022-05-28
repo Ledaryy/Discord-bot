@@ -37,20 +37,24 @@ class Bot(models.Model):
         celery.current_app.send_task(
             "backend.tasks.stop_bot", args=(self.id, delay))
 
+    def send_message(self, message, delay=0):
+        # Send message to the chat
+        celery.current_app.send_task(
+            "backend.tasks.send_message", args=(self.id, message, delay))
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        
+
         # Move to the create function
-        
+
         try:
             self.balance
         except Balance.DoesNotExist:
             self.balance = Balance.objects.create(bot=self)
             self.balance.save()
-        
+
         try:
             self.task_schedule
         except TaskSchedule.DoesNotExist:
             self.task_schedule = TaskSchedule.objects.create(bot=self)
             self.task_schedule.save()
-

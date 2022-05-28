@@ -14,7 +14,7 @@ from backend.models import MoneyLog, ErrorLog
 logger = logging.getLogger(__name__)
 
 
-class BotCollecter(DiscordAndSearch, Extractor):
+class BotTools(DiscordAndSearch, Extractor):
 
     def __init__(self, bot=None):
         self.bot = bot
@@ -23,12 +23,12 @@ class BotCollecter(DiscordAndSearch, Extractor):
     def collect_work(self):
         self.send_message(WORK_CHANNEL_ID, ",work")
 
-        sleep(random.randint(5, 10))
+        sleep(5)
         message = self.get_latest_money_bot_message(
-            WORK_CHANNEL_ID, 
+            WORK_CHANNEL_ID,
             UNBELIEVABOAT_BOT_ID,
             self.bot.name
-            )
+        )
         if message:
             value = self.extract_money_value(message)
             if value:
@@ -48,14 +48,12 @@ class BotCollecter(DiscordAndSearch, Extractor):
                 comment="No message found"
             )
             error.save()
-            
 
     def collect_crime(self):
         self.send_message(WORK_CHANNEL_ID, ",crime")
 
     def collect_collect_daily(self):
         self.send_message(WORK_CHANNEL_ID, ",collect")
-
 
 
 class BotCollecterCacheManager():

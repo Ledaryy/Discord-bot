@@ -7,12 +7,13 @@ from django.urls import path, reverse
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 
-from .forms import StartBot, StopBot, MoneyForm
+from .forms import StartBot, StopBot, SendMessage, MoneyForm
 
 admin.site.register(MoneyLog)
 admin.site.register(ErrorLog)
 admin.site.register(Balance)
 admin.site.register(TaskSchedule)
+
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
@@ -48,6 +49,11 @@ class BotAdmin(admin.ModelAdmin):
                 name='stop-bot',
             ),
             path(
+                '<int:bot_id>/send-message/',
+                self.admin_site.admin_view(self.send_message),
+                name='send-message',
+            ),
+            path(
                 '<int:bot_id>/deposit/',
                 self.admin_site.admin_view(self.deposit_balance),
                 name='deposit-balance',
@@ -64,7 +70,7 @@ class BotAdmin(admin.ModelAdmin):
             )
         ]
         return custom_urls + urls
-    
+
     def display_balance(self, obj):
         if obj.balance:
             return format_html(
@@ -84,13 +90,13 @@ class BotAdmin(admin.ModelAdmin):
         else:
             return '-'
     display_task_schedule.short_description = 'Tasks Schedule'
-        
+
     def balance_actions(self, obj):
         return format_html(
             '<a class="button" href="{}">Deposit</a>'
             '<br>'
             '<br>'
-            '<a class="button" href="{}">Withdraw</a>&nbsp;'
+            '<a class="button" href="{}">Withdraw</a>'
             '<br>'
             '<br>'
             '<a class="button" href="{}">Transfer</a>',
@@ -98,10 +104,10 @@ class BotAdmin(admin.ModelAdmin):
             reverse('admin:withdraw-balance', args=[obj.id]),
             reverse('admin:transfer-balance', args=[obj.id]),
         )
-        
+
     balance_actions.short_description = 'Balance Actions'
     balance_actions.allow_tags = True
-        
+
     def deposit_balance(self, request, bot_id, *args, **kwargs):
         return self.process_action(
             request=request,
@@ -109,7 +115,7 @@ class BotAdmin(admin.ModelAdmin):
             action_title='Deposit',
             action_form=MoneyForm,
         )
-        
+
     def withdraw_balance(self, request, bot_id, *args, **kwargs):
         return self.process_action(
             request=request,
@@ -117,7 +123,7 @@ class BotAdmin(admin.ModelAdmin):
             action_title='Withdraw',
             action_form=MoneyForm,
         )
-    
+
     def transfer_balance(self, request, bot_id, *args, **kwargs):
         return self.process_action(
             request=request,
@@ -128,10 +134,14 @@ class BotAdmin(admin.ModelAdmin):
 
     def bot_actions(self, obj):
         return format_html(
-            '<a class="button" href="{}">Start</a>&nbsp;'
-            '<a class="button" href="{}">Stop</a>',
+            '<a class="button" href="{}">Start</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+            '<a class="button" href="{}">Stop</a>'
+            '<br>'
+            '<br>'
+            '<a class="button" href="{}">Send Message</a>',
             reverse('admin:start-bot', args=[obj.id]),
             reverse('admin:stop-bot', args=[obj.id]),
+            reverse('admin:send-message', args=[obj.id]),
         )
     bot_actions.short_description = 'Bot Actions'
     bot_actions.allow_tags = True
@@ -152,6 +162,14 @@ class BotAdmin(admin.ModelAdmin):
             action_title='Stop',
         )
 
+    def send_message(self, request, bot_id, *args, **kwargs):
+        return self.process_action(
+            request=request,
+            bot_id=bot_id,
+            action_form=SendMessage,
+            action_title='Send Message',
+        )
+
     def process_action(
             self,
             request,
@@ -160,7 +178,7 @@ class BotAdmin(admin.ModelAdmin):
             action_title
     ):
         bot = self.get_object(request, bot_id)
-        
+
         if request.method != 'POST':
             form = action_form()
         else:

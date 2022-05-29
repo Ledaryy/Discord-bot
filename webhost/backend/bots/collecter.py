@@ -71,9 +71,9 @@ class BotTools(DiscordAndSearch, Extractor):
                     if value:
                         MoneyLog.save_work(self.bot, value)
                 elif operation == "crime":
-                    sucess, value = self.extract_crime_money_value(message)
-                    if sucess and value:
-                        MoneyLog.save_crime(self.bot, sucess, value)
+                    crime_sucess, value = self.extract_crime_money_value(message)
+                    if value:
+                        MoneyLog.save_crime(self.bot, crime_sucess, value)
                 elif operation == "collect":
                     cash, bank = self.extract_collect_money_value(message)
                     if cash and bank:

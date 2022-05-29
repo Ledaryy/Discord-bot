@@ -143,7 +143,7 @@ class MoneyLog(models.Model):
         else:
             log = MoneyLog(
                 owner=owner,
-                value=value,
+                value=(value * -1),
                 comment="Loss by using [crime] command"
             )
             balance.cash_balance -= value

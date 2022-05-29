@@ -18,7 +18,7 @@
 4. [DONE] Role crime
     - Should run crime every 4 hours
     - Additional extractor logic (negative values)
-5. Crime bugfix
+5. [DONE] Crime bugfix
 6. Logging to the file
 7. Image hub
 

@@ -7,7 +7,7 @@ from django.urls import path, reverse
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 
-from .forms import StartBot, StopBot, SendMessage, MoneyForm
+from .forms import StartBot, StopBot, SendMessage, SendMoney, WithdrawMoney, DepositMoney
 
 admin.site.register(MoneyLog)
 admin.site.register(ErrorLog)
@@ -113,7 +113,7 @@ class BotAdmin(admin.ModelAdmin):
             request=request,
             bot_id=bot_id,
             action_title='Deposit',
-            action_form=MoneyForm,
+            action_form=DepositMoney,
         )
 
     def withdraw_balance(self, request, bot_id, *args, **kwargs):
@@ -121,7 +121,7 @@ class BotAdmin(admin.ModelAdmin):
             request=request,
             bot_id=bot_id,
             action_title='Withdraw',
-            action_form=MoneyForm,
+            action_form=WithdrawMoney,
         )
 
     def transfer_balance(self, request, bot_id, *args, **kwargs):
@@ -129,7 +129,7 @@ class BotAdmin(admin.ModelAdmin):
             request=request,
             bot_id=bot_id,
             action_title='Transfer',
-            action_form=MoneyForm,
+            action_form=SendMoney,
         )
 
     def bot_actions(self, obj):

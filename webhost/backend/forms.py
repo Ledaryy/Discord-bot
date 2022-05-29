@@ -20,18 +20,8 @@ class BotForm(forms.Form):
         except Exception as e:
             error_message = str(e)
             self.add_error(None, error_message)
-            raise
-        # if self.cleaned_data.get('send_email', False):
-        #     send_email(
-        #         to=[account.user.email],
-        #         subject_template=self.email_subject_template,
-        #         body_template=self.email_body_template,
-        #         context={
-        #             "account": account,
-        #             "action": action,
-        #         }
-        #     )
-        # return account, action
+            raise e
+
 
 
 class StartBot(BotForm):
@@ -81,13 +71,47 @@ class SendMessage(BotForm):
 
 class MoneyForm(forms.Form):
     amount = forms.IntegerField(
-        min_value=0,
-        max_value=100000,
+        min_value=1,
+        max_value=10000000,
         required=True,
         initial=0,
-        help_text="This is just a template",
+        help_text="Amount of money",
     )
 
     def save(self, bot):
-        print("Save money")
-        # return bot.add_money(self.cleaned_data['amount'])
+        try:
+            self.form_action(bot)
+        except Exception as e:
+            error_message = str(e)
+            self.add_error(None, error_message)
+            raise e
+        
+class SendMoney(MoneyForm):
+    
+    receiver = forms.CharField(
+        required=True,
+        help_text="Receiver of the money (raw dicords ID)"
+    )
+
+    def form_action(self, bot):
+        return bot.balance.transaction(
+            value=self.cleaned_data['amount'],
+            receiver=self.cleaned_data['receiver'],
+            transaction_type="send",
+        )
+
+class WithdrawMoney(MoneyForm):
+    
+    def form_action(self, bot):
+        return bot.balance.transaction(
+            value=self.cleaned_data['amount'],
+            transaction_type="withdraw",
+        )
+
+class DepositMoney(MoneyForm):
+    
+    def form_action(self, bot):
+        return bot.balance.transaction(
+            value=self.cleaned_data['amount'],
+            transaction_type="deposit",
+        )

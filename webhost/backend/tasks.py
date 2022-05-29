@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 
 from .bots.collecter import BotTools, BotCacheManager
 
+from .settings import WORK_CHANNEL_ID
+
 logger = logging.getLogger(__name__)
 
 
@@ -76,7 +78,6 @@ def send_message(bot_id: int, message: str, delay: int):
 def _send_message(bot_id: int, message: str):
     logger.info(f"Started background send message for bot: {bot_id}")
 
-    from .settings import WORK_CHANNEL_ID
 
     bot = Bot.objects.get(id=bot_id)
     _bot = BotTools(bot)
@@ -218,3 +219,49 @@ def schedule_tasks():
                     bot.task_schedule.rechedule_collect()
 
     logger.info("Finished background schedule tasks")
+
+@shared_task
+def transaction(bot_id, value, transaction_type, receiver=None):
+    logger.info(f"Started background send money for bot: {bot_id}")
+    
+    bot = Bot.objects.get(id=bot_id)
+    bot_tools = BotTools(bot)
+    
+    cache_manager = BotCacheManager(bot)
+
+    if cache_manager.is_reserved:
+        while cache_manager.is_reserved:
+            logger.info(
+                f"Chat is reserved, Bot {bot} with task {transaction_type} is on hold, waiting...")
+            delay_seconds = round(random.uniform(3, 15), 5)
+            sleep(delay_seconds)
+            cache_manager.refresh_cache()
+        else:
+            logger.info(
+                f"Chat is free, Bot {bot} with task {transaction_type} is ready to work")
+            cache_manager.reserve(transaction_type)
+    else:
+        cache_manager.reserve(transaction_type)
+
+    if transaction_type == "withdraw":
+        success, error = bot_tools.send_message(WORK_CHANNEL_ID, f",with {value}")
+    if transaction_type == "deposit":
+        success, error = bot_tools.send_message(WORK_CHANNEL_ID, f",dep {value}")
+    if transaction_type == "send":
+        success, error = bot_tools.send_message(WORK_CHANNEL_ID, f",give <@{receiver}> {value}")
+
+    cache_manager.release()
+    
+    
+    
+    if not success:
+        logger.error(f"Error while sending message: {error}")
+        error_log = ErrorLog(
+            owner=bot,
+            comment=f"Error while sending {transaction_type} message to the chat",
+            body=error
+        )
+        error_log.save()
+    
+    logger.info(f"Finished background send money for bot: {bot_id}")
+    

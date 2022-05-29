@@ -17,6 +17,16 @@
 - Uses django admin panel as main management panel.
 <img src="https://img001.prntscr.com/file/img001/SZPKJA6HRLSYAGD0QoG5GA.png"/>
 
+29/05/2022:
+- Resend feature
+- Send message feature
+- Bot Money bank and actions
+- Role collecter
+- Role crime
+- Scheduling mechanism
+- Changed license
+<img src="https://img001.prntscr.com/file/img001/LeUezOuUSYWbzNB33yBttQ.png"/>
+
 
 ## Ledary discord js api bot:
 - Added to discord:

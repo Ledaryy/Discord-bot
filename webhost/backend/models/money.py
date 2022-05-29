@@ -1,3 +1,15 @@
+#
+# Author: Andrew Kulishov <support@andrewkulishov.com>
+# Copyright (C) 2022 Andrew Kulishov - All Rights Reserved
+#
+# Created on Sun May 29 2022
+#
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+#
+# If there are any issues contact me on the email above.
+#
+
 import celery
 from django.db import models
 
@@ -158,7 +170,7 @@ class MoneyLog(models.Model):
 
         if balance.initialized:
             if cash != balance.cash_balance:
-                earned = balance.cash_balance - cash
+                earned = cash - balance.cash_balance
                 log = MoneyLog(
                     owner=owner,
                     value=earned,
@@ -170,7 +182,7 @@ class MoneyLog(models.Model):
                 balance.save()
 
             if bank != balance.bank_balance:
-                earned = balance.bank_balance - bank
+                earned = bank - balance.bank_balance
                 log = MoneyLog(
                     owner=owner,
                     value=earned,

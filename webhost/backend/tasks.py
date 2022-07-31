@@ -1,29 +1,27 @@
 #
 # Author: Andrew Kulishov <support@andrewkulishov.com>
 # Copyright (C) 2022 Andrew Kulishov - All Rights Reserved
-# 
+#
 # Created on Sun May 29 2022
-# 
+#
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
-# 
+#
 # If there are any issues contact me on the email above.
 #
 
 
-from time import sleep
-import random
 import logging
-import celery
+import random
+from datetime import datetime, timedelta, timezone
+from time import sleep
 
+import celery
 from celery import shared_task
+
+from .bots.collecter import BotCacheManager, BotTools
 from .models import ErrorLog
 from .models.bots import Bot, BotRoles
-
-from datetime import datetime, timedelta, timezone
-
-from .bots.collecter import BotTools, BotCacheManager
-
 from .settings import WORK_CHANNEL_ID
 
 logger = logging.getLogger(__name__)
@@ -31,8 +29,7 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def start_bot(bot_id, delay):
-    logger.info(
-        f"Started background task, init start bot: {bot_id}, delay: {delay}")
+    logger.info(f"Started background task, init start bot: {bot_id}, delay: {delay}")
     try:
 
         eta = datetime.now() + timedelta(minutes=delay)
@@ -46,8 +43,7 @@ def start_bot(bot_id, delay):
         )
 
     except Exception as e:
-        logger.error(
-            f"Error {e} while starting bot {bot_id}")
+        logger.error(f"Error {e} while starting bot {bot_id}")
     logger.info(f"Finished background init start bot for bot: {bot_id}")
 
 
@@ -91,7 +87,6 @@ def send_message(bot_id: int, message: str, delay: int):
 def _send_message(bot_id: int, message: str):
     logger.info(f"Started background send message for bot: {bot_id}")
 
-
     bot = Bot.objects.get(id=bot_id)
     _bot = BotTools(bot)
 
@@ -99,11 +94,7 @@ def _send_message(bot_id: int, message: str):
 
     if not success:
         logger.error(f"Error while sending message: {error}")
-        error_log = ErrorLog(
-            owner=bot,
-            comment="Error while sending message to the chat",
-            body=error
-        )
+        error_log = ErrorLog(owner=bot, comment="Error while sending message to the chat", body=error)
         error_log.save()
 
     logger.info(f"Finished background send message for bot: {bot_id}")
@@ -111,8 +102,7 @@ def _send_message(bot_id: int, message: str):
 
 @shared_task()
 def execute_tasks(bot_id: int, tasks_list: list):
-    logger.info(
-        f"Started background execute task for bot: {bot_id}, tasks: {tasks_list}")
+    logger.info(f"Started background execute task for bot: {bot_id}, tasks: {tasks_list}")
 
     bot = Bot.objects.get(id=bot_id)
 
@@ -122,14 +112,12 @@ def execute_tasks(bot_id: int, tasks_list: list):
 
         if cache_manager.is_reserved:
             while cache_manager.is_reserved:
-                logger.info(
-                    f"Chat is reserved, Bot {bot} with task {tasks_list} is on hold, waiting...")
+                logger.info(f"Chat is reserved, Bot {bot} with task {tasks_list} is on hold, waiting...")
                 delay_seconds = round(random.uniform(3, 15), 5)
                 sleep(delay_seconds)
                 cache_manager.refresh_cache()
             else:
-                logger.info(
-                    f"Chat is free, Bot {bot} with task {tasks_list} is ready to work")
+                logger.info(f"Chat is free, Bot {bot} with task {tasks_list} is ready to work")
                 cache_manager.reserve(tasks_list)
         else:
             cache_manager.reserve(tasks_list)
@@ -153,8 +141,7 @@ def execute_tasks(bot_id: int, tasks_list: list):
 
 @shared_task
 def stop_bot(bot_id, delay):
-    logger.info(
-        f"Started initial background stop task for bot: {bot_id}, delay: {delay}")
+    logger.info(f"Started initial background stop task for bot: {bot_id}, delay: {delay}")
 
     eta = datetime.now() + timedelta(minutes=delay)
 
@@ -192,8 +179,7 @@ def schedule_tasks():
 
             if bot.role == BotRoles.collecter:
 
-                diff = bot.task_schedule.next_work_task - \
-                    datetime.now(timezone.utc)
+                diff = bot.task_schedule.next_work_task - datetime.now(timezone.utc)
                 if diff < timedelta(minutes=2):
                     celery.current_app.send_task(
                         name="backend.tasks.execute_tasks",
@@ -205,8 +191,7 @@ def schedule_tasks():
                     )
                     bot.task_schedule.reschedule_work()
 
-                diff = bot.task_schedule.next_crime_task - \
-                    datetime.now(timezone.utc)
+                diff = bot.task_schedule.next_crime_task - datetime.now(timezone.utc)
                 if diff < timedelta(minutes=2):
                     celery.current_app.send_task(
                         name="backend.tasks.execute_tasks",
@@ -218,8 +203,7 @@ def schedule_tasks():
                     )
                     bot.task_schedule.reschedule_crime()
 
-                diff = bot.task_schedule.next_collect_task - \
-                    datetime.now(timezone.utc)
+                diff = bot.task_schedule.next_collect_task - datetime.now(timezone.utc)
                 if diff < timedelta(minutes=2):
                     celery.current_app.send_task(
                         name="backend.tasks.execute_tasks",
@@ -233,25 +217,24 @@ def schedule_tasks():
 
     logger.info("Finished background schedule tasks")
 
+
 @shared_task
 def transaction(bot_id, value, transaction_type, receiver=None):
     logger.info(f"Started background send money for bot: {bot_id}")
-    
+
     bot = Bot.objects.get(id=bot_id)
     bot_tools = BotTools(bot)
-    
+
     cache_manager = BotCacheManager(bot)
 
     if cache_manager.is_reserved:
         while cache_manager.is_reserved:
-            logger.info(
-                f"Chat is reserved, Bot {bot} with task {transaction_type} is on hold, waiting...")
+            logger.info(f"Chat is reserved, Bot {bot} with task {transaction_type} is on hold, waiting...")
             delay_seconds = round(random.uniform(3, 15), 5)
             sleep(delay_seconds)
             cache_manager.refresh_cache()
         else:
-            logger.info(
-                f"Chat is free, Bot {bot} with task {transaction_type} is ready to work")
+            logger.info(f"Chat is free, Bot {bot} with task {transaction_type} is ready to work")
             cache_manager.reserve(transaction_type)
     else:
         cache_manager.reserve(transaction_type)
@@ -264,17 +247,12 @@ def transaction(bot_id, value, transaction_type, receiver=None):
         success, error = bot_tools.send_message(WORK_CHANNEL_ID, f",give <@{receiver}> {value}")
 
     cache_manager.release()
-    
-    
-    
+
     if not success:
         logger.error(f"Error while sending message: {error}")
         error_log = ErrorLog(
-            owner=bot,
-            comment=f"Error while sending {transaction_type} message to the chat",
-            body=error
+            owner=bot, comment=f"Error while sending {transaction_type} message to the chat", body=error
         )
         error_log.save()
-    
+
     logger.info(f"Finished background send money for bot: {bot_id}")
-    

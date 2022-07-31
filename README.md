@@ -2,7 +2,7 @@
   <h1 align="center">
     Ledary Discord Bots Management System
   </h1>
-  
+
 <br/>
 
 # All Materials:

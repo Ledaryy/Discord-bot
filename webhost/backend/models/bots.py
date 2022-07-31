@@ -29,18 +29,15 @@ class Bot(models.Model):
 
     def start(self, delay=0):
         # Starts auto collect chain
-        celery.current_app.send_task(
-            "backend.tasks.start_bot", args=(self.id, delay))
+        celery.current_app.send_task("backend.tasks.start_bot", args=(self.id, delay))
 
     def stop(self, delay=0):
         # Stops auto collect chain
-        celery.current_app.send_task(
-            "backend.tasks.stop_bot", args=(self.id, delay))
+        celery.current_app.send_task("backend.tasks.stop_bot", args=(self.id, delay))
 
     def send_message(self, message, delay=0):
         # Send message to the chat
-        celery.current_app.send_task(
-            "backend.tasks.send_message", args=(self.id, message, delay))
+        celery.current_app.send_task("backend.tasks.send_message", args=(self.id, message, delay))
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

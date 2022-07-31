@@ -58,11 +58,11 @@ services:
     env_file:
       - ../webhost/.env.prod
 
-  flower:  
+  flower:
     image: mher/flower
     env_file:
       - ../webhost/.env.prod.flower
-    ports:  
+    ports:
       - "8888:8888"
     depends_on:
       - redis

@@ -69,13 +69,7 @@ class Balance(models.Model):
 
     def withdraw(self, value):
         # Withdraws money from the bank account
-        celery.current_app.send_task(
-            "backend.tasks.transaction", args=(
-                self.bot.id,
-                value,
-                "withdraw"
-            )
-        )
+        celery.current_app.send_task("backend.tasks.transaction", args=(self.bot.id, value, "withdraw"))
 
         self.cash_balance += value
         self.bank_balance -= value
@@ -83,13 +77,7 @@ class Balance(models.Model):
 
     def deposit(self, value):
         # Deposits money to the bank account
-        celery.current_app.send_task(
-            "backend.tasks.transaction", args=(
-                self.bot.id,
-                value,
-                "deposit"
-            )
-        )
+        celery.current_app.send_task("backend.tasks.transaction", args=(self.bot.id, value, "deposit"))
 
         self.cash_balance -= value
         self.bank_balance += value
@@ -97,14 +85,7 @@ class Balance(models.Model):
 
     def send(self, value, receiver):
         # Sends money to another account
-        celery.current_app.send_task(
-            "backend.tasks.transaction", args=(
-                self.bot.id,
-                value,
-                "send",
-                receiver
-            )
-        )
+        celery.current_app.send_task("backend.tasks.transaction", args=(self.bot.id, value, "send", receiver))
 
         self.cash_balance -= value
         self.save()
@@ -112,11 +93,7 @@ class Balance(models.Model):
 
 class MoneyLog(models.Model):
 
-    owner = models.ForeignKey(
-        "Bot",
-        related_name="money_log",
-        on_delete=models.CASCADE
-    )
+    owner = models.ForeignKey("Bot", related_name="money_log", on_delete=models.CASCADE)
     value = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -127,11 +104,7 @@ class MoneyLog(models.Model):
 
     def save_work(owner, earned):
 
-        log = MoneyLog(
-            owner=owner,
-            value=earned,
-            comment="Earned by using [work] command"
-        )
+        log = MoneyLog(owner=owner, value=earned, comment="Earned by using [work] command")
 
         log.save()
 
@@ -145,19 +118,11 @@ class MoneyLog(models.Model):
 
         balance = owner.balance
         if sucess:
-            log = MoneyLog(
-                owner=owner,
-                value=value,
-                comment="Earned by using [crime] command"
-            )
+            log = MoneyLog(owner=owner, value=value, comment="Earned by using [crime] command")
             balance.cash_balance += value
             balance.crime_earned += value
         else:
-            log = MoneyLog(
-                owner=owner,
-                value=(value * -1),
-                comment="Loss by using [crime] command"
-            )
+            log = MoneyLog(owner=owner, value=(value * -1), comment="Loss by using [crime] command")
             balance.cash_balance -= value
             balance.crime_loss += value
 
@@ -171,11 +136,7 @@ class MoneyLog(models.Model):
         if balance.initialized:
             if cash != balance.cash_balance:
                 earned = cash - balance.cash_balance
-                log = MoneyLog(
-                    owner=owner,
-                    value=earned,
-                    comment="Earned by texting in chat"
-                )
+                log = MoneyLog(owner=owner, value=earned, comment="Earned by texting in chat")
                 log.save()
                 balance.cash_balance = cash
                 balance.text_earned += earned
@@ -183,11 +144,7 @@ class MoneyLog(models.Model):
 
             if bank != balance.bank_balance:
                 earned = bank - balance.bank_balance
-                log = MoneyLog(
-                    owner=owner,
-                    value=earned,
-                    comment="Earned by collecting daily"
-                )
+                log = MoneyLog(owner=owner, value=earned, comment="Earned by collecting daily")
                 log.save()
                 balance.bank_balance = bank
                 balance.collect_earned += earned

@@ -1,43 +1,33 @@
-import logging
-import re
-from time import sleep
-import requests
 import json
+import logging
+from time import sleep
+
+import requests
 
 logger = logging.getLogger(__name__)
 
 
-class Discord():
-
+class Discord:
     def __init__(self, token=None):
         self.token = token
 
     def send_message(self, channel_id, message):
 
-        headers = {
-            "authorization": f"{self.token}"
-        }
+        headers = {"authorization": f"{self.token}"}
 
         endpoint = f"https://discord.com/api/v9/channels/{channel_id}/messages"
 
-        payload = {
-            "content": f"{message}"
-        }
+        payload = {"content": f"{message}"}
 
-        request_body = {
-            "url": endpoint,
-            "data": payload,
-            "headers": headers
-        }
+        request_body = {"url": endpoint, "data": payload, "headers": headers}
 
         retries = 0
         while True:
             r = requests.post(**request_body)
-            print(
-                f"Request sent: message: [{message}], response: [{r.status_code}]")
+            print(f"Request sent: message: [{message}], response: [{r.status_code}]")
             retries += 1
             json_response = json.loads(r.text)
-            
+
             if retries >= 5:
                 return False, json_response
             elif r.status_code == 429:
@@ -52,16 +42,11 @@ class Discord():
 
     def get_latest_messages(self, channel_id, limit=50):
 
-        headers = {
-            "authorization": f"{self.token}"
-        }
+        headers = {"authorization": f"{self.token}"}
 
         endpoint = f"https://discord.com/api/v9/channels/{channel_id}/messages?limit={limit}"
 
-        request_body = {
-            "url": endpoint,
-            "headers": headers
-        }
+        request_body = {"url": endpoint, "headers": headers}
 
         r = requests.get(**request_body)
         print(f"Request sent: limit: [{limit}], response: [{r.status_code}]")
@@ -73,13 +58,7 @@ class Discord():
 
 
 class DiscordAndSearch(Discord):
-
-    def get_latest_money_bot_message(
-        self,
-        channel_id,
-        author_id,
-        bot_name
-    ):
+    def get_latest_money_bot_message(self, channel_id, author_id, bot_name):
 
         response_json = self.get_latest_messages(channel_id, limit=20)
         if response_json:
@@ -88,8 +67,7 @@ class DiscordAndSearch(Discord):
             return None
 
         if bot_messages:
-            mentioned_by_bot_messages = self.search_mentioned_in_embeds(
-                bot_messages, bot_name)
+            mentioned_by_bot_messages = self.search_mentioned_in_embeds(bot_messages, bot_name)
         else:
             return None
 
@@ -123,8 +101,8 @@ class DiscordAndSearch(Discord):
         for message in response_json:
             if "embeds" in message:
                 if message["embeds"] != []:
-                    if "author" in message['embeds'][0]:
-                        if message['embeds'][0]['author']['name'] == bot_name:
+                    if "author" in message["embeds"][0]:
+                        if message["embeds"][0]["author"]["name"] == bot_name:
                             messages.append(message)
 
         return messages
@@ -138,7 +116,6 @@ class DiscordAndSearch(Discord):
         for i in range(len(response_json) - 1):
             for j in range(len(response_json) - i - 1):
                 if response_json[j]["timestamp"] < response_json[j + 1]["timestamp"]:
-                    response_json[j], response_json[j +
-                                                    1] = response_json[j + 1], response_json[j]
+                    response_json[j], response_json[j + 1] = response_json[j + 1], response_json[j]
 
         return response_json

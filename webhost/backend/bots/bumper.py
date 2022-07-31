@@ -2,16 +2,9 @@ import random
 import re
 from datetime import datetime, timedelta
 from time import sleep
-from discord import Discord
 
-from settings import (
-    BUMP_CHANNEL_ID,
-    BUMP_NAMES,
-    ANIHOUSE_BOT_ID,
-    BOT_NAME_TAG,
-    BUMP_COMMANDS,
-    COMMANDS_ENABLED
-)
+from discord import Discord
+from settings import ANIHOUSE_BOT_ID, BOT_NAME_TAG, BUMP_CHANNEL_ID, BUMP_COMMANDS, BUMP_NAMES, COMMANDS_ENABLED
 
 
 def get_next_target(discord):
@@ -19,18 +12,11 @@ def get_next_target(discord):
     discord.send_message(BUMP_CHANNEL_ID, "когда")
     sleep(5)
     response = discord.get_latest_messages(BUMP_CHANNEL_ID, 10)
-    message = message_finder(
-        message_json=response,
-        author_id=ANIHOUSE_BOT_ID,
-        embeds_mentions=BOT_NAME_TAG
-    )
+    message = message_finder(message_json=response, author_id=ANIHOUSE_BOT_ID, embeds_mentions=BOT_NAME_TAG)
 
-    up_time, bump_time, like_time = time_extractor(
-        message["embeds"][0]["description"])
+    up_time, bump_time, like_time = time_extractor(message["embeds"][0]["description"])
 
-    times_dict, target = target_matcher_time_utils(
-        up_time, bump_time, like_time, message
-    )
+    times_dict, target = target_matcher_time_utils(up_time, bump_time, like_time, message)
 
     return times_dict, target
 
@@ -46,7 +32,7 @@ def message_finder(
 
     # Finds the messages with the correct author
     for message in message_json:
-        if message['author']['id'] == author_id:
+        if message["author"]["id"] == author_id:
             _messages.append(message)
     if _messages == []:
         raise Exception("Author sorting error")
@@ -59,8 +45,8 @@ def message_finder(
         for message in messages:
             if "embeds" in message:
                 if message["embeds"] != []:
-                    if "author" in message['embeds'][0]:
-                        if message['embeds'][0]['author']['name'] == embeds_mentions:
+                    if "author" in message["embeds"][0]:
+                        if message["embeds"][0]["author"]["name"] == embeds_mentions:
                             _messages.append(message)
     if _messages == []:
         raise Exception("Embeds sorting error")
@@ -96,23 +82,22 @@ def time_extractor(message):
     for line in clear_message_list:
         hours, minutes, seconds = 0, 0, 0
         if "час" in line:
-            numbers = re.findall(r'\d+', f"{line}")
+            numbers = re.findall(r"\d+", f"{line}")
             hours = int(numbers[0])
             minutes = int(numbers[1])
             seconds = int(numbers[2])
 
-            time_timedelta = timedelta(
-                hours=hours, minutes=minutes, seconds=seconds)
+            time_timedelta = timedelta(hours=hours, minutes=minutes, seconds=seconds)
 
         elif "минут" in line:
-            numbers = re.findall(r'\d+', f"{line}")
+            numbers = re.findall(r"\d+", f"{line}")
             minutes = int(numbers[0])
             seconds = int(numbers[1])
 
             time_timedelta = timedelta(minutes=minutes, seconds=seconds)
 
         elif "секунд" in line:
-            seconds = int(re.findall(r'\d+', f"{line}")[0])
+            seconds = int(re.findall(r"\d+", f"{line}")[0])
 
             time_timedelta = timedelta(seconds=seconds)
 
@@ -146,15 +131,14 @@ def time_extractor(message):
 
 def target_matcher_time_utils(up_time, bump_time, like_time, body):
 
-    time = datetime.fromisoformat(body['timestamp'])
+    time = datetime.fromisoformat(body["timestamp"])
     current_time = datetime.now().astimezone()
     times_dict = BUMP_NAMES
     times_dict["UP"] = (time + up_time) - current_time
     times_dict["BUMP"] = (time + bump_time) - current_time
     times_dict["LIKE"] = (time + like_time) - current_time
 
-    minimal_time = min(
-        times_dict["UP"], times_dict["BUMP"], times_dict["LIKE"])
+    minimal_time = min(times_dict["UP"], times_dict["BUMP"], times_dict["LIKE"])
 
     for key, val in times_dict.items():
         if val == minimal_time:
@@ -164,9 +148,9 @@ def target_matcher_time_utils(up_time, bump_time, like_time, body):
     return times_dict, next_target
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    print('Enter your token:')
+    print("Enter your token:")
     TOKEN = input()
 
     discord = Discord(token=TOKEN)
@@ -183,7 +167,7 @@ if __name__ == '__main__':
         print(f"Waiting {(values[target] + send_delay)} seconds")
         sleep(values[target] + send_delay)
 
-        if target in COMMANDS_ENABLED:  
+        if target in COMMANDS_ENABLED:
             discord.send_message(BUMP_CHANNEL_ID, BUMP_COMMANDS[target])
             print(f"{BUMP_COMMANDS[target]} used!")
         else:

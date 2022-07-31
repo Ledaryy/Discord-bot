@@ -1,7 +1,6 @@
-from logging import raiseExceptions
 from django import forms
 
-from .models import Bot
+# from .models import Bot
 from .models.bots import BotRoles
 
 
@@ -23,49 +22,39 @@ class BotForm(forms.Form):
             raise e
 
 
-
 class StartBot(BotForm):
 
-    role = forms.ChoiceField(
-        required=True,
-        help_text="Starts diffrent type of the bot",
-        choices=BotRoles.choices
-    )
+    role = forms.ChoiceField(required=True, help_text="Starts diffrent type of the bot", choices=BotRoles.choices)
 
     field_order = (
-        'delay',
-        'role',
+        "delay",
+        "role",
     )
 
     def form_action(self, bot):
         print(f"Start bot {bot}")
         if bot.is_active:
             raise Exception("Bot is already active")
-        bot.role = self.cleaned_data['role']
+        bot.role = self.cleaned_data["role"]
         bot.save()
-        return bot.start(delay=self.cleaned_data['delay'])
+        return bot.start(delay=self.cleaned_data["delay"])
 
 
 class StopBot(BotForm):
-
     def form_action(self, bot):
         if not bot.is_active:
-            raise Exception('Bot is already inactive')
-        return bot.stop(delay=self.cleaned_data['delay'])
+            raise Exception("Bot is already inactive")
+        return bot.stop(delay=self.cleaned_data["delay"])
 
 
 class SendMessage(BotForm):
 
-    message = forms.CharField(
-        max_length=255,
-        required=True,
-        help_text="Bot will send this message to the chat"
-    )
+    message = forms.CharField(max_length=255, required=True, help_text="Bot will send this message to the chat")
 
     def form_action(self, bot):
         return bot.send_message(
-            message=self.cleaned_data['message'],
-            delay=self.cleaned_data['delay'],
+            message=self.cleaned_data["message"],
+            delay=self.cleaned_data["delay"],
         )
 
 
@@ -85,33 +74,31 @@ class MoneyForm(forms.Form):
             error_message = str(e)
             self.add_error(None, error_message)
             raise e
-        
+
+
 class SendMoney(MoneyForm):
-    
-    receiver = forms.CharField(
-        required=True,
-        help_text="Receiver of the money (raw dicords ID)"
-    )
+
+    receiver = forms.CharField(required=True, help_text="Receiver of the money (raw dicords ID)")
 
     def form_action(self, bot):
         return bot.balance.transaction(
-            value=self.cleaned_data['amount'],
-            receiver=self.cleaned_data['receiver'],
+            value=self.cleaned_data["amount"],
+            receiver=self.cleaned_data["receiver"],
             transaction_type="send",
         )
 
+
 class WithdrawMoney(MoneyForm):
-    
     def form_action(self, bot):
         return bot.balance.transaction(
-            value=self.cleaned_data['amount'],
+            value=self.cleaned_data["amount"],
             transaction_type="withdraw",
         )
 
+
 class DepositMoney(MoneyForm):
-    
     def form_action(self, bot):
         return bot.balance.transaction(
-            value=self.cleaned_data['amount'],
+            value=self.cleaned_data["amount"],
             transaction_type="deposit",
         )

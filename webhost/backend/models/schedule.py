@@ -1,5 +1,6 @@
-from django.db import models
 from datetime import datetime, timedelta, timezone
+
+from django.db import models
 from django.utils import timezone as django_timezone
 
 
@@ -19,12 +20,9 @@ class TaskSchedule(models.Model):
         # Fixed delay for 180 seconds, needed for the first task
         delay = 180
 
-        self.next_work_task = datetime.now(
-            timezone.utc) + timedelta(seconds=delay)
-        self.next_crime_task = datetime.now(
-            timezone.utc) + timedelta(seconds=delay+1)
-        self.next_collect_task = datetime.now(
-            timezone.utc) + timedelta(seconds=delay+2)
+        self.next_work_task = datetime.now(timezone.utc) + timedelta(seconds=delay)
+        self.next_crime_task = datetime.now(timezone.utc) + timedelta(seconds=delay + 1)
+        self.next_collect_task = datetime.now(timezone.utc) + timedelta(seconds=delay + 2)
 
         self.save()
 
@@ -37,8 +35,7 @@ class TaskSchedule(models.Model):
 
         # 0-30 minutes, 5 decimal places
         delay_seconds = round(random.uniform(15, 120), 5)
-        eta = datetime.now(timezone.utc) + timedelta(hours=hours,
-                                                     minutes=minutes, seconds=delay_seconds)
+        eta = datetime.now(timezone.utc) + timedelta(hours=hours, minutes=minutes, seconds=delay_seconds)
         return eta
 
     def reschedule_work(self):

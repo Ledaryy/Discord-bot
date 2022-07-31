@@ -3,12 +3,8 @@ from django.db import models
 
 class ErrorLog(models.Model):
 
-    owner = models.ForeignKey(
-        "Bot",
-        related_name="errors",
-        on_delete=models.CASCADE
-    )
-        
+    owner = models.ForeignKey("Bot", related_name="errors", on_delete=models.CASCADE)
+
     date = models.DateTimeField(auto_now_add=True)
     comment = models.TextField()
     body = models.TextField(blank=True)
